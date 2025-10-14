@@ -1,0 +1,19 @@
+{
+  "resource_pack_name": "bedwars_mega_pack",
+  "texture_name": "atlas.items",
+  "padding": 8,
+  "num_mip_levels": 4,
+  "texture_data": {
+    "iron_sword": { "textures": "textures/items/iron_sword" },
+    "diamond_sword": { "textures": "textures/items/diamond_sword" },
+    "iron_pickaxe": { "textures": "textures/items/iron_pickaxe" },
+    "diamond_pickaxe": { "textures": "textures/items/diamond_pickaxe" },
+    "iron_axe": { "textures": "textures/items/iron_axe" },
+    "diamond_axe": { "textures": "textures/items/diamond_axe" },
+    "shears": { "textures": "textures/items/shears" },
+    "iron_ingot": { "textures": "textures/items/iron_ingot" },
+    "gold_ingot": { "textures": "textures/items/gold_ingot" },
+    "diamond": { "textures": "textures/items/diamond" },
+    "emerald": { "textures": "textures/items/emerald" }
+  }
+}
