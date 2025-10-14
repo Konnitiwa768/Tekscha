@@ -1,0 +1,2 @@
+# Tekscha
+https://chatgpt.com
