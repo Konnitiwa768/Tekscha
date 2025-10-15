@@ -1,0 +1,14 @@
+{
+  "resource_pack_name": "bedwars_mega_pack",
+  "texture_name": "atlas.terrain",
+  "padding": 8,
+  "num_mip_levels": 4,
+  "texture_data": {
+    "red_wool": { "textures": "textures/block/red_wool" },
+    "blue_wool": { "textures": "textures/block/blue_wool" },
+    "oak_planks": { "textures": "textures/block/oak_planks" },
+    "obsidian": { "textures": "textures/block/obsidian" },
+    "deepslate": { "textures": "textures/block/deepslate" },
+    "stone": { "textures": "textures/block/stone" }
+  }
+}
