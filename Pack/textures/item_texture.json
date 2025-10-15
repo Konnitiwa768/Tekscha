@@ -24,6 +24,7 @@
     "iron_axe": { "textures": "textures/item/iron_axe" },
     "diamond_axe": { "textures": "textures/item/diamond_axe" },
     "shears": { "textures": "textures/item/shears" },
+    "golden_apple": { "textures": "textures/item/golden_apple" },
     "iron_ingot": { "textures": "textures/item/iron_ingot" },
     "gold_ingot": { "textures": "textures/item/gold_ingot" },
     "diamond": { "textures": "textures/item/diamond" },
