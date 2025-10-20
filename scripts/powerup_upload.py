@@ -20,7 +20,7 @@ driver.get("https://www.powerupstack.com/auth/login?redirect=/panel/instances/ko
 
 wait = WebDriverWait(driver, 20)
 
-# === URLログ平行スレッド ===
+# 平行ログスレッド
 def log_url_continuously():
     try:
         while True:
@@ -32,33 +32,45 @@ def log_url_continuously():
 log_thread = threading.Thread(target=log_url_continuously, daemon=True)
 log_thread.start()
 
-# === JS root配下の input を待って取得 ===
-def wait_for_inputs():
+# === Email / Password ラベルに紐づく input を JS で取得 ===
+def find_input_by_label(label_text):
+    script = f"""
+    const labels = document.querySelectorAll('label');
+    for (let lbl of labels) {{
+        if (lbl.textContent.trim() === "{label_text}") {{
+            const id = lbl.getAttribute('for');
+            if (id) return document.getElementById(id);
+        }}
+    }}
+    return null;
     for _ in range(20):  # 最大20回リトライ
-        inputs = driver.execute_script("return document.querySelectorAll('div#root input');")
-        if inputs and len(inputs) >= 2:
-            return inputs
+        input_elem = driver.execute_script(script)
+        if input_elem:
+            return input_elem
         time.sleep(0.5)
-    raise Exception("Input fields not found in root")
+    raise Exception(f"Input field with label '{label_text}' not found")
 
-inputs = wait_for_inputs()
+email_input = find_input_by_label("Email")
+password_input = find_input_by_label("Password")
 
-# Selenium WebElement に変換（execute_script だとJSオブジェクトなので）
-inputs[0].send_keys(USERNAME)
-inputs[1].send_keys(PASSWORD)
+email_input.send_keys(USERNAME)
+password_input.send_keys(PASSWORD)
 
-# loginボタンも root 内で取得
+# loginボタン
 login_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@id='root']//button[contains(., 'login') or contains(., 'Login')]")))
 login_button.click()
 
-# ページ遷移を JS root に合わせて固定待機
-time.sleep(15)
+# ログイン後ページを直接開く
+driver.get("https://www.powerupstack.com/panel/instances/komugi/files?path=resource_packs")
+time.sleep(6)
 
-# upload ボタン取得
-upload_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@id='root']//button[contains(., 'upload') or contains(., 'Upload files')]")))
+# uploadボタン操作
+upload_button = wait.until(EC.element_to_be_clickable(
+    (By.XPATH, "//div[@id='root']//button[contains(., 'upload') or contains(., 'Upload files')]")
+))
 upload_button.click()
 
-# input[type=file] に Pack/ を指定
+# ファイル送信
 file_input = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@id='root']//input[@type='file']")))
 file_input.send_keys(FILE_PATH)
 
