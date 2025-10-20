@@ -52,7 +52,7 @@ login_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@id='root
 login_button.click()
 
 # ページ遷移を JS root に合わせて固定待機
-time.sleep(6)
+time.sleep(15)
 
 # upload ボタン取得
 upload_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@id='root']//button[contains(., 'upload') or contains(., 'Upload files')]")))
