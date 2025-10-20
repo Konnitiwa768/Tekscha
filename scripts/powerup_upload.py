@@ -37,7 +37,7 @@ login_button.click()
 wait.until(EC.url_contains("/panel/instances/komugi/files"))
 
 # uploadボタン
-upload_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'upload') or contains(., 'Upload')]")))
+upload_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'upload') or contains(., 'Upload files')]")))
 upload_button.click()
 
 # input[type=file] に Pack/ を指定
