@@ -43,6 +43,7 @@ def find_input_by_label(label_text):
         }}
     }}
     return null;
+    """
     for _ in range(20):  # 最大20回リトライ
         input_elem = driver.execute_script(script)
         if input_elem:
