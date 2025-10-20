@@ -19,6 +19,14 @@ driver.get("https://www.powerupstack.com/auth/login?redirect=/panel/instances/ko
 
 wait = WebDriverWait(driver, 20)
 
+# 進行状況ログ: 5秒ごとにURL確認
+def log_url(duration=20):
+    elapsed = 0
+    while elapsed < duration:
+        print(f"[LOG] Current URL: {driver.current_url}")
+        time.sleep(5)
+        elapsed += 5
+
 # 修正版: inputs配列で取得
 inputs = wait.until(EC.presence_of_all_elements_located((By.TAG_NAME, "input")))
 
@@ -33,8 +41,11 @@ inputs[1].send_keys(PASSWORD)
 login_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'login') or contains(., 'Login')]")))
 login_button.click()
 
+# ページ遷移待ち中にURLをログ
+log_url(duration=20)
+
 # ページ遷移待ち
-wait.until(EC.url_contains("/panel/instances/komugi/files"))
+time.sleep(6)
 
 # uploadボタン
 upload_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'upload') or contains(., 'Upload files')]")))
@@ -45,6 +56,9 @@ file_input = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type
 file_input.send_keys(FILE_PATH)
 
 print("✅ Upload Completed")
+
+# 最終URLログ
+print(f"[LOG] Final URL: {driver.current_url}")
 
 time.sleep(3)
 driver.quit()
