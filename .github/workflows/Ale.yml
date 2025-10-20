@@ -1,0 +1,33 @@
+name: PowerUpStack Upload
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          pip install selenium
+
+      - name: Install Chrome
+        run: |
+          sudo apt update
+          sudo apt install -y chromium-browser
+
+      - name: Run Upload Script
+        env:
+          PUP_USER: ${{ secrets.PUP_USER }}
+          PUP_PASS: ${{ secrets.PUP_PASS }}
+        run: |
+          python3 scripts/powerup_upload.py
