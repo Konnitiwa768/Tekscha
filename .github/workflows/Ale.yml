@@ -1,6 +1,7 @@
 name: PowerUpStack Upload
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
