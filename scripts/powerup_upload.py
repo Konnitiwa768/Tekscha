@@ -10,25 +10,32 @@ SCREENSHOT_DIR = "screenshots"
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 
 
-def find_upload_button(page):
-    """Upload ボタンを探して返す（複数パターンで検索）"""
+def find_upload_target(page):
+    """
+    'u'または'U'を含むボタン・inputを広く探索して返す。
+    text, aria-label, title, class, name, data属性などを包括。
+    """
     selectors = [
-        'button:has-text("Upload")',
-        'text="Upload"',
-        '[aria-label*="Upload"]',
-        '[title*="Upload"]',
-        '[data-tooltip*="Upload"]',
-        '[class*="upload"]',
-        'button:has-text("UPLOAD")',
-        'button:has-text("アップロード")',
-        'text="アップロード"',
+        'button:has-text("U")',
+        'button:has-text("u")',
+        'input[aria-label*="U"]',
+        'input[aria-label*="u"]',
+        'input[title*="U"]',
+        'input[title*="u"]',
+        'input[name*="U"]',
+        'input[name*="u"]',
+        '[class*="U"]',
+        '[class*="u"]',
+        '[data-tooltip*="U"]',
+        '[data-tooltip*="u"]',
+        'text=/.*[Uu].*/',
     ]
     for sel in selectors:
         btn = page.query_selector(sel)
         if btn:
             print(f"✔ 見つかった: {sel}")
             return btn
-    print("⚠️ Uploadボタンが見つかりません。")
+    print("⚠️ 'U'を含むUpload要素が見つかりません。")
     return None
 
 
@@ -38,7 +45,7 @@ def main():
         context = browser.new_context()
         page = context.new_page()
 
-        # === ステップ1: ログイン ===
+        # === STEP 1: ログインページ ===
         print("[STEP] ログインページへ移動")
         page.goto("https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi/files?path=resource_packs")
         page.screenshot(path=f"{SCREENSHOT_DIR}/01_login_page.png")
@@ -55,26 +62,27 @@ def main():
         page.wait_for_load_state("networkidle")
         page.screenshot(path=f"{SCREENSHOT_DIR}/02_after_login.png")
 
-        # === ステップ2: ファイルページへ ===
+        # === STEP 2: ファイルページ ===
         print("[STEP] ファイルページへ移動")
         page.goto("https://www.powerupstack.com/panel/instances/komugi/files?path=resource_packs")
         page.wait_for_load_state("networkidle")
         time.sleep(2)
         page.screenshot(path=f"{SCREENSHOT_DIR}/03_resource_page.png")
 
-        # === ステップ3: Upload検出＆送信 ===
-        print("[STEP] Uploadボタン探索開始")
+        # === STEP 3: Uploadターゲット検出 ===
+        print("[STEP] Upload関連要素探索開始")
         upload_btn = None
-        for i in range(5):  # 5回リトライ
-            upload_btn = find_upload_button(page)
+        for i in range(5):
+            upload_btn = find_upload_target(page)
             if upload_btn:
                 break
             time.sleep(1)
             page.reload()
-        if not upload_btn:
-            raise Exception("Uploadボタンが見つかりませんでした。")
 
-        # === ステップ4: ファイル選択 ===
+        if not upload_btn:
+            raise Exception("⚠️ Uploadボタン/入力欄が見つかりませんでした。")
+
+        # === STEP 4: ファイル選択 ===
         print("[STEP] ファイルアップロード開始")
         with page.expect_file_chooser() as fc_info:
             upload_btn.click()
