@@ -21,28 +21,26 @@ jobs:
 
       - name: Install dependencies
         run: |
-          set +e
           python -m pip install --upgrade pip
           pip install selenium pillow
 
-      - name: Install ChromeDriver
+      - name: Install Chromium & ChromeDriver
         run: |
-          set +e
           sudo apt-get update
           sudo apt-get install -y chromium-browser chromium-chromedriver
-          echo "✅ ChromeDriver installed."
+          # 確認用
+          chromium-browser --version
+          chromedriver --version
 
       - name: Run upload script
         env:
           PUP_USER: ${{ secrets.PUP_USER }}
           PUP_PASS: ${{ secrets.PUP_PASS }}
         run: |
-          set +e
           python3 scripts/powerup_upload.py || echo "⚠️ Script continued despite error"
 
       - name: Commit screenshots
         run: |
-          set +e
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add screenshots/*.png || true
