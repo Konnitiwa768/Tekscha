@@ -34,7 +34,6 @@ jobs:
           cd Pack/textures/models/armor
           for img in *.png; do
             convert "$img" -modulate 80,100,100 "$img"
-            mv "dark_$img" "$img"
           done
 
       - name: Commit and push updated textures
