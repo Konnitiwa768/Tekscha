@@ -9,7 +9,6 @@ SCREENSHOT_DIR = "screenshots"
 
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 
-
 def find_upload_target(page):
     """'u' または 'U' を含むボタン・inputを広く探索"""
     selectors = [
@@ -38,34 +37,27 @@ def find_upload_target(page):
     print("⚠️ 'U' を含むUpload要素が見つかりません。")
     return None
 
-
 def find_file_input(page):
     """input[type=file] を探す"""
     try:
+        # webkitdirectory対応 input[type=file] を優先して探す
+        file_input = page.query_selector('input[type="file"][webkitdirectory]')
+        if file_input:
+            print("✔ webkitdirectory対応 input[type=file] を検出")
+            return file_input
+        # 通常の file input も念のため
         file_input = page.query_selector('input[type="file"]')
         if file_input:
-            print("✔ input[type=file] を検出しました。")
+            print("✔ 通常の input[type=file] を検出")
             return file_input
     except Exception:
         pass
     print("⚠️ input[type=file] が見つかりません。")
     return None
 
-
-def collect_files(folder):
-    """フォルダ内の全ファイルを再帰的に取得"""
-    file_list = []
-    for root, _, files in os.walk(folder):
-        for f in files:
-            full_path = os.path.join(root, f)
-            if os.path.isfile(full_path):
-                file_list.append(full_path)
-    return file_list
-
-
 def main():
     with sync_playwright() as p:
-        browser = p.chromium.launch()  # headless=False でファイル選択挙動安定
+        browser = p.chromium.launch()  # headless=False で挙動確認可能
         context = browser.new_context()
         page = context.new_page()
 
@@ -75,7 +67,6 @@ def main():
         page.wait_for_load_state("networkidle")
         page.screenshot(path=f"{SCREENSHOT_DIR}/01_login_page.png")
 
-        print("[STEP] 認証情報入力")
         inputs = page.query_selector_all("input")
         if len(inputs) >= 2:
             inputs[0].fill(USERNAME)
@@ -84,7 +75,6 @@ def main():
         else:
             raise Exception("⚠️ 入力欄が2つ未満です。")
 
-        # ログインボタン押下
         login_btn = page.query_selector("button:has-text('Login')")
         if login_btn:
             login_btn.click()
@@ -119,23 +109,16 @@ def main():
             time.sleep(1)
             page.reload()
 
-        # === STEP 4: ファイル送信 ===
-        print("[STEP] input[type=file] 探索・送信")
+        # === STEP 4: フォルダアップロード ===
+        print("[STEP] フォルダをwebkitdirectoryで送信")
         file_input = None
         for i in range(6):
             file_input = find_file_input(page)
             if file_input:
-                files_to_send = collect_files(FILE_DIR)
-                if not files_to_send:
-                    raise Exception(f"⚠️ {FILE_DIR} にファイルがありません。")
-
-                print(f"📦 送信対象 {len(files_to_send)} 件:")
-                for f in files_to_send:
-                    print("   -", f)
-
                 try:
-                    file_input.set_input_files(files_to_send)
-                    print("✅ ファイル送信完了")
+                    # フォルダ単位で送信
+                    file_input.set_input_files(FILE_DIR)
+                    print(f"✅ フォルダ '{FILE_DIR}' の送信完了")
                 except Exception as e:
                     print(f"⚠️ set_input_filesでエラー: {e}")
                 break
