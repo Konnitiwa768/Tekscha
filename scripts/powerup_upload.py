@@ -1,124 +1,62 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import os
 import time
-import threading
-import traceback
+import asyncio
+from playwright.async_api import async_playwright
 
 USERNAME = os.getenv("PUP_USER", "example@example.com")
 PASSWORD = os.getenv("PUP_PASS", "password123")
-FILE_PATH = "Pack/"
+FILE_PATH = "Pack/"  # アップロード対象
 SCREENSHOT_DIR = "screenshots"
 
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 
-def safe_action(step_name, func):
-    """例外を握りつぶして続行"""
-    try:
-        print(f"[STEP] {step_name}")
-        func()
-        print(f"✅ {step_name} 完了")
-    except Exception as e:
-        print(f"[⚠️] {step_name} でエラー: {e}")
-        traceback.print_exc()
+async def main():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        context = await browser.new_context()
+        page = await context.new_page()
 
-def save_screenshot(driver, name):
-    """ステップごとに固定名で上書き保存"""
-    try:
-        path = os.path.join(SCREENSHOT_DIR, f"{name}.png")
-        driver.save_screenshot(path)
-        print(f"[📸] Saved: {path}")
-    except:
-        pass
+        # === ステップ1: ログインページへ ===
+        print("[STEP] ログインページへ移動")
+        await page.goto("https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi/files?path=resource_packs")
+        await page.screenshot(path=os.path.join(SCREENSHOT_DIR, "01_login_page.png"))
 
-options = webdriver.ChromeOptions()
-options.add_argument("--headless")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
-options.add_argument("--window-size=1280,800")
+        # === ステップ2: 認証情報入力 ===
+        print("[STEP] 認証情報入力")
+        await page.fill("input[type='email']", USERNAME)
+        await page.fill("input[type='password']", PASSWORD)
+        await page.screenshot(path=os.path.join(SCREENSHOT_DIR, "02_filled_credentials.png"))
 
-driver = webdriver.Chrome(options=options)
-wait = WebDriverWait(driver, 20)
+        # === ステップ3: ログインボタン ===
+        print("[STEP] ログインボタン押下")
+        await page.click("button:has-text('Login')")
+        await page.wait_for_load_state("networkidle")
+        await page.screenshot(path=os.path.join(SCREENSHOT_DIR, "03_after_login.png"))
 
-# === URLログスレッド ===
-def log_urls():
-    try:
-        while True:
-            print(f"[LOG] Current URL: {driver.current_url}")
-            time.sleep(5)
-    except Exception:
-        pass
+        # === ステップ4: ファイルページ ===
+        print("[STEP] ファイルページへ移動")
+        await page.goto("https://www.powerupstack.com/panel/instances/komugi/files?path=resource_packs")
+        await page.wait_for_load_state("networkidle")
+        await page.screenshot(path=os.path.join(SCREENSHOT_DIR, "04_resource_page.png"))
 
-threading.Thread(target=log_urls, daemon=True).start()
+        # === ステップ5: アップロードボタン ===
+        print("[STEP] アップロードボタン押下")
+        await page.click("button:has-text('Upload')")
+        await asyncio.sleep(1)
+        await page.screenshot(path=os.path.join(SCREENSHOT_DIR, "05_clicked_upload.png"))
 
-# === ステップ1: ログインページへ ===
-safe_action("ログインページへ移動", lambda: driver.get(
-    "https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi/files?path=resource_packs"
-))
-save_screenshot(driver, "01_login_page")
+        # === ステップ6: ファイル送信 ===
+        print("[STEP] ファイル送信")
+        # Playwrightのfile chooserイベントで送信
+        async with page.expect_file_chooser() as fc_info:
+            await page.click("input[type='file'], button:has-text('Choose File')")
+        file_chooser = await fc_info.value
+        await file_chooser.set_files(FILE_PATH)
+        await asyncio.sleep(2)
+        await page.screenshot(path=os.path.join(SCREENSHOT_DIR, "06_file_sent.png"))
 
-# === ステップ2: 入力欄を取得して入力 ===
-def input_credentials():
-    inputs = driver.find_elements(By.TAG_NAME, "input")
-    if len(inputs) >= 2:
-        inputs[0].clear()
-        inputs[0].send_keys(USERNAME)
-        inputs[1].clear()
-        inputs[1].send_keys(PASSWORD)
-    else:
-        raise Exception("入力欄が2つ未満です")
+        print("✅ 全ステップ完了")
+        await browser.close()
 
-safe_action("認証情報入力", input_credentials)
-save_screenshot(driver, "02_filled_credentials")
-
-# === ステップ3: ログインボタンをクリック ===
-def click_login():
-    btn = wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, "//button[contains(translate(., 'LOGIN', 'login'), 'login')]")
-        )
-    )
-    btn.click()
-    time.sleep(5)
-
-safe_action("ログインボタン押下", click_login)
-save_screenshot(driver, "03_after_login")
-
-# === ステップ4: ファイルページに遷移 ===
-safe_action("ファイルページへ移動", lambda: driver.get(
-    "https://www.powerupstack.com/panel/instances/komugi/files?path=resource_packs"
-))
-time.sleep(6)
-save_screenshot(driver, "04_resource_page")
-
-# === ステップ5: アップロードボタン押下 ===
-def click_upload_button():
-    btn = wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, "//button[contains(translate(., 'UPLOAD', 'upload'), 'upload')]")
-        )
-    )
-    btn.click()
-    time.sleep(2)
-
-safe_action("アップロードボタン押下", click_upload_button)
-save_screenshot(driver, "05_clicked_upload")
-
-# === ステップ6: ファイル送信 ===
-def send_file():
-    file_input = wait.until(
-        EC.presence_of_element_located((By.XPATH, "//input[@type='file']"))
-    )
-    file_input.send_keys(FILE_PATH)
-    time.sleep(2)
-
-safe_action("ファイル送信", send_file)
-save_screenshot(driver, "06_file_sent")
-
-print("✅ 全ステップ完了（エラー無視モード）")
-print(f"[LOG] Final URL: {driver.current_url}")
-
-time.sleep(3)
-driver.quit()
+if __name__ == "__main__":
+    asyncio.run(main())
