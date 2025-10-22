@@ -20,10 +20,14 @@ def main():
         page.goto("https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi/files?path=resource_packs")
         page.screenshot(path=os.path.join(SCREENSHOT_DIR, "01_login_page.png"))
 
-        # === ステップ2: 認証情報入力 ===
+        # === ステップ2: 認証情報入力（上から1番目、2番目） ===
         print("[STEP] 認証情報入力")
-        page.fill("input[type='email']", USERNAME)
-        page.fill("input[type='password']", PASSWORD)
+        inputs = page.query_selector_all("input")
+        if len(inputs) >= 2:
+            inputs[0].fill(USERNAME)
+            inputs[1].fill(PASSWORD)
+        else:
+            raise Exception("入力欄が2つ未満です")
         page.screenshot(path=os.path.join(SCREENSHOT_DIR, "02_filled_credentials.png"))
 
         # === ステップ3: ログインボタン ===
@@ -40,14 +44,14 @@ def main():
 
         # === ステップ5: アップロードボタン ===
         print("[STEP] アップロードボタン押下")
-        page.click("button:has-text('Upload files')")
+        page.click("button:has-text('Upload file')")
         time.sleep(1)
         page.screenshot(path=os.path.join(SCREENSHOT_DIR, "05_clicked_upload.png"))
 
         # === ステップ6: ファイル送信 ===
         print("[STEP] ファイル送信")
         with page.expect_file_chooser() as fc_info:
-            page.click("input[type='file']")
+            page.click("input[type='file'],")
         file_chooser = fc_info.value
         file_chooser.set_files(FILE_PATH)
         time.sleep(2)
