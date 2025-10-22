@@ -4,10 +4,33 @@ from playwright.sync_api import sync_playwright
 
 USERNAME = os.getenv("PUP_USER", "example@example.com")
 PASSWORD = os.getenv("PUP_PASS", "password123")
-FILE_PATH = "Pack/"  # アップロード対象
+FILE_PATH = "Pack/"
 SCREENSHOT_DIR = "screenshots"
 
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
+
+
+def find_upload_button(page):
+    """Upload ボタンを探して返す（複数パターンで検索）"""
+    selectors = [
+        'button:has-text("Upload")',
+        'text="Upload"',
+        '[aria-label*="Upload"]',
+        '[title*="Upload"]',
+        '[data-tooltip*="Upload"]',
+        '[class*="upload"]',
+        'button:has-text("UPLOAD")',
+        'button:has-text("アップロード")',
+        'text="アップロード"',
+    ]
+    for sel in selectors:
+        btn = page.query_selector(sel)
+        if btn:
+            print(f"✔ 見つかった: {sel}")
+            return btn
+    print("⚠️ Uploadボタンが見つかりません。")
+    return None
+
 
 def main():
     with sync_playwright() as p:
@@ -15,48 +38,56 @@ def main():
         context = browser.new_context()
         page = context.new_page()
 
-        # === ステップ1: ログインページへ ===
+        # === ステップ1: ログイン ===
         print("[STEP] ログインページへ移動")
         page.goto("https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi/files?path=resource_packs")
-        page.screenshot(path=os.path.join(SCREENSHOT_DIR, "01_login_page.png"))
+        page.screenshot(path=f"{SCREENSHOT_DIR}/01_login_page.png")
 
-        # === ステップ2: 認証情報入力（上から1番目、2番目） ===
         print("[STEP] 認証情報入力")
         inputs = page.query_selector_all("input")
         if len(inputs) >= 2:
             inputs[0].fill(USERNAME)
             inputs[1].fill(PASSWORD)
         else:
-            raise Exception("入力欄が2つ未満です")
-        page.screenshot(path=os.path.join(SCREENSHOT_DIR, "02_filled_credentials.png"))
+            raise Exception("⚠️ 入力欄が2つ未満です。")
 
-        # === ステップ3: ログインボタン ===
-        print("[STEP] ログインボタン押下")
         page.click("button:has-text('Login')")
         page.wait_for_load_state("networkidle")
-        page.screenshot(path=os.path.join(SCREENSHOT_DIR, "03_after_login.png"))
+        page.screenshot(path=f"{SCREENSHOT_DIR}/02_after_login.png")
 
-        # === ステップ4: ファイルページ ===
+        # === ステップ2: ファイルページへ ===
         print("[STEP] ファイルページへ移動")
         page.goto("https://www.powerupstack.com/panel/instances/komugi/files?path=resource_packs")
         page.wait_for_load_state("networkidle")
-        page.screenshot(path=os.path.join(SCREENSHOT_DIR, "04_resource_page.png"))
+        time.sleep(2)
+        page.screenshot(path=f"{SCREENSHOT_DIR}/03_resource_page.png")
 
-        # === ステップ5+6: アップロードボタン押下 + ファイル送信 ===
-        print("[STEP] アップロード & ファイル送信")
-        upload_btn = page.query_selector('button:has-text("Upload")')
-        if upload_btn:
-            with page.expect_file_chooser() as fc_info:
-                upload_btn.click()
-            file_chooser = fc_info.value
-            file_chooser.set_files(FILE_PATH)
-            time.sleep(2)
-            page.screenshot(path=os.path.join(SCREENSHOT_DIR, "05_file_uploaded.png"))
-        else:
-            print("⚠️ 'Upload' ボタンが見つかりませんでした")
+        # === ステップ3: Upload検出＆送信 ===
+        print("[STEP] Uploadボタン探索開始")
+        upload_btn = None
+        for i in range(5):  # 5回リトライ
+            upload_btn = find_upload_button(page)
+            if upload_btn:
+                break
+            time.sleep(1)
+            page.reload()
+        if not upload_btn:
+            raise Exception("Uploadボタンが見つかりませんでした。")
 
-        print("✅ 全ステップ完了")
+        # === ステップ4: ファイル選択 ===
+        print("[STEP] ファイルアップロード開始")
+        with page.expect_file_chooser() as fc_info:
+            upload_btn.click()
+        file_chooser = fc_info.value
+        file_chooser.set_files(FILE_PATH)
+        print("✔ ファイル選択完了")
+
+        time.sleep(3)
+        page.screenshot(path=f"{SCREENSHOT_DIR}/04_after_upload.png")
+
+        print("✅ 全工程完了")
         browser.close()
+
 
 if __name__ == "__main__":
     main()
