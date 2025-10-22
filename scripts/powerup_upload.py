@@ -1,16 +1,38 @@
 import os
 import time
+import requests
 from playwright.sync_api import sync_playwright
 
 USERNAME = os.getenv("PUP_USER", "example@example.com")
 PASSWORD = os.getenv("PUP_PASS", "password123")
-FILE_DIR = "Pack/"  # アップロード対象フォルダ
 SCREENSHOT_DIR = "screenshots"
+DOWNLOAD_DIR = "downloads"
 
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
+os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+
+# ダウンロード対象 URL と保存先
+FILE_URL = "https://www.mediafire.com/file/edtuuuwc707524t/Nebula_%255B32x%255D_No_Hit_Particles.mcpack/file"
+FILE_NAME = "Nebula_[32x]_No_Hit_Particles.mcpack"
+FILE_PATH = os.path.join(DOWNLOAD_DIR, FILE_NAME)
+
+
+def download_file():
+    if os.path.exists(FILE_PATH):
+        print(f"✔ ファイル既に存在: {FILE_PATH}")
+        return
+
+    print(f"📥 ダウンロード開始: {FILE_URL}")
+    resp = requests.get(FILE_URL, stream=True)
+    resp.raise_for_status()
+
+    with open(FILE_PATH, "wb") as f:
+        for chunk in resp.iter_content(8192):
+            f.write(chunk)
+    print(f"✅ ダウンロード完了: {FILE_PATH}")
+
 
 def find_upload_target(page):
-    """'u' または 'U' を含むボタン・inputを広く探索"""
     selectors = [
         'button:has-text("U")',
         'button:has-text("u")',
@@ -27,46 +49,39 @@ def find_upload_target(page):
         'text=/.*[Uu].*/',
     ]
     for sel in selectors:
-        try:
-            btn = page.query_selector(sel)
-            if btn:
-                print(f"✔ 見つかった: {sel}")
-                return btn
-        except Exception:
-            continue
-    print("⚠️ 'U' を含むUpload要素が見つかりません。")
+        btn = page.query_selector(sel)
+        if btn:
+            print(f"✔ 見つかった Upload 要素: {sel}")
+            return btn
+    print("⚠️ Upload要素が見つかりません。")
     return None
+
 
 def find_file_input(page):
-    """input[type=file] を探す"""
-    try:
-        # webkitdirectory対応 input[type=file] を優先して探す
-        file_input = page.query_selector('input[type="file"][webkitdirectory]')
-        if file_input:
-            print("✔ webkitdirectory対応 input[type=file] を検出")
-            return file_input
-        # 通常の file input も念のため
-        file_input = page.query_selector('input[type="file"]')
-        if file_input:
-            print("✔ 通常の input[type=file] を検出")
-            return file_input
-    except Exception:
-        pass
-    print("⚠️ input[type=file] が見つかりません。")
+    file_input = page.query_selector('input[type="file"]')
+    if file_input:
+        print("✔ input[type=file] 検出")
+        return file_input
+    print("⚠️ input[type=file] が見つかりません")
     return None
 
+
 def main():
+    download_file()
+
     with sync_playwright() as p:
-        browser = p.chromium.launch()  # headless=False で挙動確認可能
+        browser = p.chromium.launch(headless=False)
         context = browser.new_context()
         page = context.new_page()
 
         # === STEP 1: ログインページ ===
-        print("[STEP] ログインページへ移動")
-        page.goto("https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi2/files?path=resource_packs")
+        page.goto(
+            "https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi/files?path=development_resource_packs"
+        )
         page.wait_for_load_state("networkidle")
         page.screenshot(path=f"{SCREENSHOT_DIR}/01_login_page.png")
 
+        # ログイン情報入力
         inputs = page.query_selector_all("input")
         if len(inputs) >= 2:
             inputs[0].fill(USERNAME)
@@ -75,62 +90,46 @@ def main():
         else:
             raise Exception("⚠️ 入力欄が2つ未満です。")
 
+        # ログインボタン押下
         login_btn = page.query_selector("button:has-text('Login')")
         if login_btn:
             login_btn.click()
         else:
-            print("⚠️ Loginボタンが見つかりません。Enter送信します。")
             inputs[1].press("Enter")
 
         page.wait_for_load_state("networkidle")
         time.sleep(2)
         page.screenshot(path=f"{SCREENSHOT_DIR}/02_after_login.png")
 
-        # === STEP 2: ファイルページ ===
-        print("[STEP] ファイルページへ移動")
-        page.goto("https://www.powerupstack.com/panel/instances/komugi/files?path=resource_packs")
-        page.wait_for_load_state("networkidle")
-        time.sleep(2)
-        page.screenshot(path=f"{SCREENSHOT_DIR}/03_resource_page.png")
-
-        # === STEP 3: Uploadボタン探索 ===
-        print("[STEP] Uploadボタン探索")
+        # === STEP 2: Uploadボタン探索 ===
         upload_btn = None
-        for i in range(6):
+        for i in range(5):
             upload_btn = find_upload_target(page)
             if upload_btn:
-                try:
-                    upload_btn.click()
-                    print("✔ Uploadボタンクリック成功")
-                except Exception:
-                    print("⚠️ Uploadボタンクリックに失敗、再試行中…")
+                upload_btn.click()
+                print("✔ Uploadボタンクリック成功")
                 time.sleep(1)
                 break
             time.sleep(1)
             page.reload()
 
-        # === STEP 4: フォルダアップロード ===
-        print("[STEP] フォルダをwebkitdirectoryで送信")
+        # === STEP 3: ファイル送信 ===
         file_input = None
-        for i in range(6):
+        for i in range(5):
             file_input = find_file_input(page)
             if file_input:
                 try:
-                    # フォルダ単位で送信
-                    file_input.set_input_files(FILE_DIR)
-                    print(f"✅ フォルダ '{FILE_DIR}' の送信完了")
+                    file_input.set_input_files(FILE_PATH)
+                    print(f"✅ ファイル送信完了: {FILE_PATH}")
                 except Exception as e:
                     print(f"⚠️ set_input_filesでエラー: {e}")
                 break
-            else:
-                print("🔄 input[type=file] 再探索中…")
-                time.sleep(1)
-                page.reload()
+            time.sleep(1)
+            page.reload()
 
-        time.sleep(5)
-        page.screenshot(path=f"{SCREENSHOT_DIR}/04_after_upload.png")
-
-        print("🎉 全工程完了")
+        time.sleep(3)
+        page.screenshot(path=f"{SCREENSHOT_DIR}/03_after_upload.png")
+        print("🎉 アップロード完了")
         browser.close()
 
 
