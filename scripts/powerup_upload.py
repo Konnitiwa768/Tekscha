@@ -12,7 +12,7 @@ os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 
 def find_upload_target(page):
     """
-    'u'または'U'を含むボタン・inputを広く探索して返す。
+    'u' または 'U' を含むボタン・inputを広く探索して返す。
     text, aria-label, title, class, name, data属性などを包括。
     """
     selectors = [
@@ -35,7 +35,17 @@ def find_upload_target(page):
         if btn:
             print(f"✔ 見つかった: {sel}")
             return btn
-    print("⚠️ 'U'を含むUpload要素が見つかりません。")
+    print("⚠️ 'U' を含むUpload要素が見つかりません。")
+    return None
+
+
+def find_file_input(page):
+    """input[type=file] を直接探す"""
+    file_input = page.query_selector('input[type="file"]')
+    if file_input:
+        print("✔ input[type=file] を検出しました。")
+        return file_input
+    print("⚠️ input[type=file] が見つかりません。")
     return None
 
 
@@ -69,26 +79,29 @@ def main():
         time.sleep(2)
         page.screenshot(path=f"{SCREENSHOT_DIR}/03_resource_page.png")
 
-        # === STEP 3: Uploadターゲット検出 ===
-        print("[STEP] Upload関連要素探索開始")
+        # === STEP 3: Upload ボタンを探して押下 ===
+        print("[STEP] Uploadボタン探索")
         upload_btn = None
         for i in range(5):
             upload_btn = find_upload_target(page)
             if upload_btn:
+                upload_btn.click()
+                time.sleep(1)
                 break
             time.sleep(1)
             page.reload()
 
-        if not upload_btn:
-            raise Exception("⚠️ Uploadボタン/入力欄が見つかりませんでした。")
-
-        # === STEP 4: ファイル選択 ===
-        print("[STEP] ファイルアップロード開始")
-        with page.expect_file_chooser() as fc_info:
-            upload_btn.click()
-        file_chooser = fc_info.value
-        file_chooser.set_files(FILE_PATH)
-        print("✔ ファイル選択完了")
+        # === STEP 4: ファイル input に直接送信 ===
+        print("[STEP] input[type=file] 探索・送信")
+        file_input = None
+        for i in range(5):
+            file_input = find_file_input(page)
+            if file_input:
+                file_input.set_input_files(FILE_PATH)
+                print(f"✔ ファイル送信完了: {FILE_PATH}")
+                break
+            time.sleep(1)
+            page.reload()
 
         time.sleep(3)
         page.screenshot(path=f"{SCREENSHOT_DIR}/04_after_upload.png")
@@ -99,3 +112,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+        
