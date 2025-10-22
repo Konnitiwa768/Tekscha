@@ -44,7 +44,7 @@ def main():
 
         # === ステップ5: アップロードボタン ===
         print("[STEP] アップロードボタン押下")
-        page.click("button:has-text('Upload files')")
+        page.click("button:has-text('Upload')")
         time.sleep(1)
         page.screenshot(path=os.path.join(SCREENSHOT_DIR, "05_clicked_upload.png"))
 
