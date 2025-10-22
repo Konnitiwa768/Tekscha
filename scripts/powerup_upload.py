@@ -4,17 +4,14 @@ from playwright.sync_api import sync_playwright
 
 USERNAME = os.getenv("PUP_USER", "example@example.com")
 PASSWORD = os.getenv("PUP_PASS", "password123")
-FILE_PATH = "Pack/"
+FILE_DIR = "Pack/"  # フォルダ指定
 SCREENSHOT_DIR = "screenshots"
 
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 
 
 def find_upload_target(page):
-    """
-    'u' または 'U' を含むボタン・inputを広く探索して返す。
-    text, aria-label, title, class, name, data属性などを包括。
-    """
+    """'u' または 'U' を含むボタン・inputを広く探索"""
     selectors = [
         'button:has-text("U")',
         'button:has-text("u")',
@@ -40,13 +37,23 @@ def find_upload_target(page):
 
 
 def find_file_input(page):
-    """input[type=file] を直接探す"""
+    """input[type=file] を探す"""
     file_input = page.query_selector('input[type="file"]')
     if file_input:
         print("✔ input[type=file] を検出しました。")
         return file_input
     print("⚠️ input[type=file] が見つかりません。")
     return None
+
+
+def collect_files(folder):
+    """フォルダ内の全ファイルを再帰的に取得"""
+    file_list = []
+    for root, _, files in os.walk(folder):
+        for f in files:
+            full_path = os.path.join(root, f)
+            file_list.append(full_path)
+    return file_list
 
 
 def main():
@@ -79,7 +86,7 @@ def main():
         time.sleep(2)
         page.screenshot(path=f"{SCREENSHOT_DIR}/03_resource_page.png")
 
-        # === STEP 3: Upload ボタンを探して押下 ===
+        # === STEP 3: Uploadボタン ===
         print("[STEP] Uploadボタン探索")
         upload_btn = None
         for i in range(5):
@@ -91,14 +98,19 @@ def main():
             time.sleep(1)
             page.reload()
 
-        # === STEP 4: ファイル input に直接送信 ===
+        # === STEP 4: ファイル送信 ===
         print("[STEP] input[type=file] 探索・送信")
         file_input = None
         for i in range(5):
             file_input = find_file_input(page)
             if file_input:
-                file_input.set_input_files(FILE_PATH)
-                print(f"✔ ファイル送信完了: {FILE_PATH}")
+                files_to_send = collect_files(FILE_DIR)
+                if not files_to_send:
+                    raise Exception(f"⚠️ {FILE_DIR} にファイルがありません。")
+                file_input.set_input_files(files_to_send)
+                print(f"✔ ファイル送信完了 ({len(files_to_send)} 件)")
+                for f in files_to_send:
+                    print("  -", f)
                 break
             time.sleep(1)
             page.reload()
@@ -112,4 +124,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-        
