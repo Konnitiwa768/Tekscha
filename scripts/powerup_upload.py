@@ -65,7 +65,7 @@ def collect_files(folder):
 
 def main():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)  # headless=False でファイル選択挙動安定
+        browser = p.chromium.launch()  # headless=False でファイル選択挙動安定
         context = browser.new_context()
         page = context.new_page()
 
