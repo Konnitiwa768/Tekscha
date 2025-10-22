@@ -33,7 +33,7 @@ jobs:
         run: |
           cd Pack/textures/models/armor
           for img in *.png; do
-            convert "$img" -modulate 80,100,100 "dark_$img"
+            convert "$img" -modulate 80,100,100 "$img"
             mv "dark_$img" "$img"
           done
 
