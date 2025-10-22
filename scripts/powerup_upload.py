@@ -42,20 +42,18 @@ def main():
         page.wait_for_load_state("networkidle")
         page.screenshot(path=os.path.join(SCREENSHOT_DIR, "04_resource_page.png"))
 
-        # === ステップ5: アップロードボタン ===
-        print("[STEP] アップロードボタン押下")
-        page.click("button:has-text('Upload')")
-        time.sleep(1)
-        page.screenshot(path=os.path.join(SCREENSHOT_DIR, "05_clicked_upload.png"))
-
-        # === ステップ6: ファイル送信 ===
-        print("[STEP] ファイル送信")
-        with page.expect_file_chooser() as fc_info:
-            page.click("input[type='file'],")
-        file_chooser = fc_info.value
-        file_chooser.set_files(FILE_PATH)
-        time.sleep(2)
-        page.screenshot(path=os.path.join(SCREENSHOT_DIR, "06_file_sent.png"))
+        # === ステップ5+6: アップロードボタン押下 + ファイル送信 ===
+        print("[STEP] アップロード & ファイル送信")
+        upload_btn = page.query_selector('button:has-text("Upload")')
+        if upload_btn:
+            with page.expect_file_chooser() as fc_info:
+                upload_btn.click()
+            file_chooser = fc_info.value
+            file_chooser.set_files(FILE_PATH)
+            time.sleep(2)
+            page.screenshot(path=os.path.join(SCREENSHOT_DIR, "05_file_uploaded.png"))
+        else:
+            print("⚠️ 'Upload' ボタンが見つかりませんでした")
 
         print("✅ 全ステップ完了")
         browser.close()
