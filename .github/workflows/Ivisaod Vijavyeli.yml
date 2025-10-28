@@ -29,5 +29,6 @@ jobs:
           mkdir -p output
           mv nebula.mcpack output/
           git add output/nebula.mcpack
+          git pull
           git commit -m "Update mcpack automatically"
           git push
