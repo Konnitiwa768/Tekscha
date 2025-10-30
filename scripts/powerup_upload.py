@@ -12,7 +12,7 @@ os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # ダウンロード対象 URL と保存先
-FILE_URL = "https://www.mediafire.com/file/edtuuuwc707524t/Nebula_%255B32x%255D_No_Hit_Particles.mcpack/file"#"https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
+FILE_URL = "https://www.mediafire.com/file/4d2zbn2fwnm4wx0/sibanoinu.mcpack/file"#"https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
 FILE_NAME = "nebula.zip"
 FILE_PATH = os.path.join(DOWNLOAD_DIR, FILE_NAME)
 
