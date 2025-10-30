@@ -12,8 +12,8 @@ os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # ダウンロード対象 URL と保存先
-FILE_URL = "https://www.mediafire.com/file/2w6tfzcapfgo6ia/misery%2528hik5k%2529.mcpack/file?dkey=470pw9bjdlk&r=697"#"https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# https://www.mediafire.com/file/edtuuuwc707524t/Nebula_%255B32x%255D_No_Hit_Particles.mcpack/file
-FILE_NAME = "Ymzie.mcpack"
+FILE_URL = "https://www.mediafire.com/file/2w6tfzcapfgo6ia/misery%2528hik5k%2529.mcpack/file"#"https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# https://www.mediafire.com/file/edtuuuwc707524t/Nebula_%255B32x%255D_No_Hit_Particles.mcpack/file
+FILE_NAME = "misery.zip"
 FILE_PATH = os.path.join(DOWNLOAD_DIR, FILE_NAME)
 
 
