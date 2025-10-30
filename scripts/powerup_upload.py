@@ -13,7 +13,7 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # ダウンロード対象 URL と保存先
 FILE_URL = "https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack?dkey=4cicezzbf5g&r=371"# https://www.mediafire.com/file/edtuuuwc707524t/Nebula_%255B32x%255D_No_Hit_Particles.mcpack/file
-FILE_NAME = "Ymzie.zip"
+FILE_NAME = "Ymzie.mcpack"
 FILE_PATH = os.path.join(DOWNLOAD_DIR, FILE_NAME)
 
 
