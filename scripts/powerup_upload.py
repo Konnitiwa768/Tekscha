@@ -12,7 +12,7 @@ os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # ダウンロード対象 URL と保存先
-FILE_URL = "https://www.mediafire.com/file/edtuuuwc707524t/Nebula_%255B32x%255D_No_Hit_Particles.mcpack/file"
+FILE_URL = "https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack?dkey=4cicezzbf5g&r=371"# https://www.mediafire.com/file/edtuuuwc707524t/Nebula_%255B32x%255D_No_Hit_Particles.mcpack/file
 FILE_NAME = "Nebula_[32x]_No_Hit_Particles.mcpack"
 FILE_PATH = os.path.join(DOWNLOAD_DIR, FILE_NAME)
 
@@ -76,7 +76,7 @@ def main():
 
         # === STEP 1: ログインページ ===
         page.goto(
-            "https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi/files?path=development_resource_packs"
+            "https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugix/files?path=resource_packs"
         )
         page.wait_for_load_state("networkidle")
         page.screenshot(path=f"{SCREENSHOT_DIR}/01_login_page.png")
