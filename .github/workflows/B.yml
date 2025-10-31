@@ -23,7 +23,7 @@ jobs:
           cd Pack/textures/models/armor
 
           BASE_URL="https://raw.githubusercontent.com/Mojang/bedrock-samples/main/resource_pack/textures/models/armor"
-          FILES=("chain_1.png" "chain_2.png" "iron_1.png" "iron_2.png" "diamond_1.png" "diamond_2.png" "cloth_1.png" "cloth_2.png" "gold_2.png" "gold_1.png" "netherite_1.png" "netherite_2.png")
+          FILES=("chain_1.png" "chain_2.png" "iron_1.png" "iron_2.png" "diamond_1.png" "diamond_2.png" "cloth_1.png" "cloth_2.png" "gold_2.png" "gold_1.png" "netherite_1.png" "netherite_2.png" "copper_1.png" "copper_2.png")
 
           for f in "${FILES[@]}"; do
             curl -L -O "$BASE_URL/$f"
