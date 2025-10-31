@@ -12,8 +12,8 @@ os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # ダウンロード対象 URL と保存先
-FILE_URL = "https://www.mediafire.com/file/2w7o9a7ncctn4yi/BlackFade_%255B128x%255D.mcpack.zip/file"#"https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
-FILE_NAME = "ym.zip"
+FILE_URL = "https://konnitiwa768.github.io/Tekscha/releases/Bedwars_mega.mcpack" #https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
+FILE_NAME = "wow.zip"
 FILE_PATH = os.path.join(DOWNLOAD_DIR, FILE_NAME)
 
 
