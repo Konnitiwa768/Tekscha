@@ -16,9 +16,7 @@ jobs:
 
       - name: Create MCPack archive
         run: |
-          cd Pack
-          zip -r ../Bedwars_Mega.mcpack .
-          cd ..
+          zip -r Bedwars_Mega.mcpack Pack
 
       - name: Commit MCPack file
         run: |
