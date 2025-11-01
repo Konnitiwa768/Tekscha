@@ -76,7 +76,7 @@ def main():
 
         # === STEP 1: ログインページ ===
         page.goto(
-            "https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugix/files?path=behavior_packs"
+            "https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugix/files?path=resource_packs"
         )
         page.wait_for_load_state("networkidle")
         page.screenshot(path=f"{SCREENSHOT_DIR}/01_login_page.png")
