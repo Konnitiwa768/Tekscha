@@ -127,7 +127,7 @@ def main():
             time.sleep(1)
             page.reload()
 
-        time.sleep(8)
+        time.sleep(12)
         page.screenshot(path=f"{SCREENSHOT_DIR}/03_after_upload.png")
         print("🎉 アップロード完了")
         browser.close()
