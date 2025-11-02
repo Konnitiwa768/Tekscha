@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 
 INPUT_PATH = "SP.png"
-OUTPUT_DIR = "overworld_cubemap"
+OUTPUT_DIR = "Pack/textures/environment/overworld_cubemap"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # 出力順序（Bedrock対応）
