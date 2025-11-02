@@ -1,4 +1,4 @@
-name: Deploy Bedwars-Mega.mcpack
+name: Deploy Bedwars-Mega.mcpack 
 
 on:
   push:
