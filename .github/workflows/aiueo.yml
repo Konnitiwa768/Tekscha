@@ -16,17 +16,17 @@ jobs:
 
       - name: Create MCPack archive
         run: |
-          unzip -Z -p nebula output/nebula.mcpack nebula/
+          mkdir -p nebula
+          unzip output/nebula.mcpack -d nebula/
 
       - name: Commit MCPack file
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          if [ -f Bedwars_Mega.mcpack ]; then
-            mkdir -p nebula
+          if [ -d nebula ]; then
             git add nebula/
-            git commit -m "Auto-build: Bedwars Mega MCPack updated"
+            git commit -m "Auto-build: Bedwars Mega MCPack updated" || echo "No changes to commit"
             git push
           else
             echo "No .mcpack file generated."
