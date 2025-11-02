@@ -5,61 +5,6 @@
   "num_mip_levels": 4,
   "texture_data": {
     "diamond_boots": { "textures": "textures/item/diamond_boots" },
-    "axe": {
-      "textures": [
-        "textures/items/wood_axe",
-        "textures/items/stone_axe",
-        "textures/items/iron_axe",
-        "textures/items/gold_axe",
-        "textures/items/diamond_axe",
-        "textures/items/netherite_axe",
-        "textures/items/copper_axe"
-      ]
-    }
-    "pickaxe": {
-      "textures": [
-        "textures/items/wood_pickaxe",
-        "textures/items/stone_pickaxe",
-        "textures/items/iron_pickaxe",
-        "textures/items/gold_pickaxe",
-        "textures/items/diamond_pickaxe",
-        "textures/items/netherite_pickaxe",
-        "textures/items/copper_pickaxe"
-      ]
-    },
-    "sword": {
-      "textures": [
-        "textures/items/wood_sword",
-        "textures/items/stone_sword",
-        "textures/items/iron_sword",
-        "textures/items/gold_sword",
-        "textures/items/diamond_sword",
-        "textures/items/netherite_sword",
-        "textures/items/copper_sword"
-      ]
-    },
-    "shovel": {
-      "textures": [
-        "textures/items/wood_shovel",
-        "textures/items/stone_shovel",
-        "textures/items/iron_shovel",
-        "textures/items/gold_shovel",
-        "textures/items/diamond_shovel",
-        "textures/items/netherite_shovel",
-        "textures/items/copper_shovel"
-      ]
-    },
-    "hoe": {
-      "textures": [
-        "textures/items/wood_hoe",
-        "textures/items/stone_hoe",
-        "textures/items/iron_hoe",
-        "textures/items/gold_hoe",
-        "textures/items/diamond_hoe",
-        "textures/items/netherite_hoe",
-        "textures/items/copper_hoe"
-      ]
-    },
     "diamond_leggings": { "textures": "textures/item/diamond_leggings" },
     "diamond_chestplate": { "textures": "textures/item/diamond_chestplate" },
     "diamond_helmet": { "textures": "textures/item/diamond_helmet" },
