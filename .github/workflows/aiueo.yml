@@ -16,7 +16,7 @@ jobs:
 
       - name: Create MCPack archive
         run: |
-          unzip -Z -p nebula output/nebula.mcpack
+          unzip -Z -p nebula output/nebula.mcpack nebula/
 
       - name: Commit MCPack file
         run: |
