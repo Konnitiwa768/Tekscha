@@ -4,7 +4,7 @@
   "padding": 8,
   "num_mip_levels": 4,
   "texture_data": {
-    "fireball": { "textures": "textures/item/fireball"},
+    "fireball": { "textures": "textures/item/fireball" },
     "ender_pearl": { "textures": "textures/item/ender_pearl" },
     "shears": { "textures": "textures/item/shears" },
     "golden_apple": { "textures": "textures/item/golden_apple" },
