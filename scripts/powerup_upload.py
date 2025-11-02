@@ -13,7 +13,7 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # ダウンロード対象 URL と保存先
 FILE_URL = "https://konnitiwa768.github.io/Tekscha/releases/Bedwars_Mega.mcpack" #https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
-FILE_NAME = "wow2.zip"
+FILE_NAME = "wow3.zip"
 FILE_PATH = os.path.join(DOWNLOAD_DIR, FILE_NAME)
 
 
@@ -127,7 +127,7 @@ def main():
             time.sleep(1)
             page.reload()
 
-        time.sleep(3)
+        time.sleep(8)
         page.screenshot(path=f"{SCREENSHOT_DIR}/03_after_upload.png")
         print("🎉 アップロード完了")
         browser.close()
