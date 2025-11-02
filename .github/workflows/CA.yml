@@ -17,10 +17,10 @@ jobs:
 
       - name: Move Pack/textures/item to items
         run: |
-          mkdir -p items
-          if [ -d "Pack/textures/item" ]; then
-            mv Pack/textures/item/* items/ || true
-            rm -rf Pack/textures/item
+          mkdir -p Pack/textures/items
+          if [ -d "items" ]; then
+            mv items/* Pack/textures/items || true
+            rm -rf items
           fi
 
       - name: Commit and push changes
