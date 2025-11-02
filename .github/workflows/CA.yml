@@ -1,0 +1,33 @@
+name: Move Item Textures
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  move_textures:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      - name: Move Pack/textures/item to items
+        run: |
+          mkdir -p items
+          if [ -d "Pack/textures/item" ]; then
+            mv Pack/textures/item/* items/ || true
+            rm -rf Pack/textures/item
+          fi
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Move item textures from Pack/textures/item to items" || echo "No changes to commit"
+          git pull
+          git push
