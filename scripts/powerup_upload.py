@@ -12,7 +12,7 @@ os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # ダウンロード対象 URL と保存先　
-FILE_URL =  "https://konnitiwa768.github.io/PVPVe/packs.mcaddon" #"https://github.com/Konnitiwa768/Tekscha/raw/refs/heads/main/releases/Bedwars_Mega.mcpack" #https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
+FILE_URL =  "https://github.com/Konnitiwa768/Tekscha/raw/refs/heads/main/releases/Bedwars_Mega.mcpack" #https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
 FILE_NAME = "wow50.zip"
 FILE_PATH = os.path.join(DOWNLOAD_DIR, FILE_NAME)
 
