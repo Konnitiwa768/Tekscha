@@ -36,4 +36,4 @@ jobs:
           git add custom_inventory_no_frame/
           git pull
           git commit -m "Update custom_inventory_no_frame files (from Dropbox)" || echo "Nothing to commit"
-          git push o
+          git push
