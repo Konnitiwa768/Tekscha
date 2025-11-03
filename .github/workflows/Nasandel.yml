@@ -9,7 +9,6 @@ on:
 jobs:
   dropbox_upload:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,27 +21,19 @@ jobs:
       - name: Download Dropbox ZIP
         run: |
           URL="https://www.dropbox.com/scl/fo/n61ol6nl98lmbyhr84552/ACla11MS4du6IhMjK2QZkUc/inventory%20view%20no%20frame/custom%20inventory%20no%20frame?rlkey=ysj2ubsm8kb94ite7ub31koby&subfolder_nav_tracking=1&st=im3b3hkb&dl=1"
-          OUTFILE="custom_inventory_no_frame.zip"
-          curl -L --fail -o "${OUTFILE}" "${URL}"
+          curl -L --fail -o custom_inventory_no_frame.zip "${URL}"
 
-      - name: Clean previous extraction
+      - name: Clean extraction folder
         run: |
           rm -rf custom_inventory_no_frame
           mkdir -p custom_inventory_no_frame
 
-      - name: Extract ZIP safely using Python script
-        run: |
-          python3 ngrakventen.py
+      - name: Extract ZIP using Python
+        run: python3 extract_zip.py
 
-      - name: Clean up ZIP file
+      - name: Commit and push
         run: |
-          rm -f custom_inventory_no_frame.zip
-
-      - name: Commit and push changes
-        run: |
-          git add .
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
-            git commit -m "Update custom_inventory_no_frame files (from Dropbox)"
-            git push origin main
+          git add custom_inventory_no_frame/
+          git pull
+          git commit -m "Update custom_inventory_no_frame files (from Dropbox)" || echo "Nothing to commit"
+          git push o
