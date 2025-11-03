@@ -10,9 +10,9 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # 出力順序（Bedrock対応）
 FACES = [
     ("cubemap_0.png", 0, 0),            # north
-    ("cubemap_1.png", math.pi / 2, 0),  # east
+    ("cubemap_3.png", math.pi / 2, 0),  # east
     ("cubemap_2.png", math.pi, 0),      # south
-    ("cubemap_3.png", -math.pi / 2, 0), # west
+    ("cubemap_1.png", -math.pi / 2, 0), # west
     ("cubemap_4.png", 0, -math.pi / 2), # up
     ("cubemap_5.png", 0, math.pi / 2),  # down
 ]
