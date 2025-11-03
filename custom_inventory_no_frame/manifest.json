@@ -1,0 +1,18 @@
+{
+    "format_version": 2,
+    "header": {
+        "description": "custom inventory no frame",
+        "name": "custom inventory no frame",
+        "uuid": "aa9c5f0e-784e-40a9-b06d-399c55760054",
+        "version": [0, 0, 1],
+        "min_engine_version": [ 1, 14, 0 ]
+    },
+    "modules": [
+        {
+            "description": "custom inventory no frame",
+            "type": "resources",
+            "uuid": "f226e7be-34b7-48c2-a784-16a8704681bd",
+            "version": [0, 0, 1]
+        }
+    ]
+}
