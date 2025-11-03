@@ -1,0 +1,35 @@
+name: Dropbox Download & Upload
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  dropbox_upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Pull latest changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Download from Dropbox
+        run: |
+          URL="https://www.dropbox.com/scl/fo/n61ol6nl98lmbyhr84552/ACla11MS4du6IhMjK2QZkUc/inventory%20view%20no%20frame/custom%20inventory%20no%20frame?rlkey=ysj2ubsm8kb94ite7ub31koby&subfolder_nav_tracking=1&st=im3b3hkb&dl=1"
+          OUTFILE="custom_inventory_no_frame.zip"
+          curl -L -o "${OUTFILE}" "${URL}"
+          mkdir -p custom_inventory_no_frame
+          unzip -o "${OUTFILE}" -d custom_inventory_no_frame
+
+      - name: Commit and push changes
+        run: |
+          git add custom_inventory_no_frame
+          git pull
+          git commit -m "Update custom_inventory_no_frame files" || echo "No changes to commit"
+          git push origin main
