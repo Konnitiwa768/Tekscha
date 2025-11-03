@@ -13,7 +13,7 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # ダウンロード対象 URL と保存先　
 FILE_URL =  "https://konnitiwa768.github.io/PVPVe/packs.mcaddon" #"https://github.com/Konnitiwa768/Tekscha/raw/refs/heads/main/releases/Bedwars_Mega.mcpack" #https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
-FILE_NAME = "wow40.zip"
+FILE_NAME = "wow50.zip"
 FILE_PATH = os.path.join(DOWNLOAD_DIR, FILE_NAME)
 
 
@@ -76,7 +76,7 @@ def main():
 
         # === STEP 1: ログインページ ===
         page.goto(
-            "https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi5/files?path=behavior_packs"
+            "https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi5/files?path=resource_packs"
         )
         page.wait_for_load_state("networkidle")
         page.screenshot(path=f"{SCREENSHOT_DIR}/01_login_page.png")
