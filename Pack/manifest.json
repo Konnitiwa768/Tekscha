@@ -1,18 +1,23 @@
 {
   "format_version": 2,
   "header": {
-    "description": "Bedwars Mega Resource Pack - team wool, deepslate, and item textures",
-    "name": "Bedwars Mega Pack",
-    "uuid": "b52cb3da-45ae-4e4d-b1b2-9b6b1829dfc0",
+    "name": "Bedwars Durability Display BP",
+    "description": "Displays durability in a fixed HUD position with warnings.",
+    "uuid": "8f8479c2-c83b-4db1-bad3-9a3e1234b7aa",
     "version": [1, 0, 0],
-    "min_engine_version": [1, 20, 0]
+    "min_engine_version": [1, 21, 0]
   },
   "modules": [
     {
-      "description": "Bedwars Mega Textures Module",
-      "type": "resources",
-      "uuid": "49f05c68-0908-440f-a50d-c16bdb648b9e",
-      "version": [1, 0, 0]
+      "type": "script",
+      "uuid": "5e215cc4-317c-4e25-8458-62e10da33f99",
+      "version": [1, 0, 0],
+      "entry": "scripts/durability_display.js",
+      "description": "Main durability display logic."
     }
+  ],
+  "dependencies": [
+    { "module_name": "@minecraft/server", "version": "1.10.0" },
+    { "module_name": "@minecraft/server-ui", "version": "1.2.0" }
   ]
 }
