@@ -13,7 +13,7 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # ダウンロード対象 URL と保存先　
 FILE_URL = "https://download1529.mediafire.com/6ixhlycbeipgT9fmjaDHaLqpzMzj7S78iiE9Et_47sWWZ5Wt3_hH56xtLuhhNL36_RKkANegYSRdj_POn3-yOiEoALnI1f0mbK1eaE-SlDOrhXkF45GmXxSnTGWAUfNxyGPEhMGKPUxLp-3h3dY5Wl4KMwppRFWX0CPjlxRtYSMb/ceh7kasx9zrto70/hp%2Bdp_v7.2.0_asa.mcaddon" #"https://github.com/GotembaYuka/Gote-Supporter/releases/download/v1.7.3/Gote-Supporter_v1.7.3.mcpack"#"https://github.com/Konnitiwa768/Tekscha/raw/refs/heads/main/releases/Bedwars_Mega.mcpack"#https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
-FILE_NAME = "i.zip"
+FILE_NAME = "j.zip"
 FILE_PATH = os.path.join(DOWNLOAD_DIR, FILE_NAME)
 
 
