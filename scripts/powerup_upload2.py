@@ -4,7 +4,7 @@ import requests
 from playwright.sync_api import sync_playwright
 
 # ===== 設定 =====
-API_KEY = os.getenv("CURSEFORGE_API_KEY", "YOUR_API_KEY_HERE")
+API_KEY = "$2a$10$.VBEA/K70RmkFNkXN0tpUut7axu/R/NIkJg6UI0.8QlWCcpxZw1bm"
 USERNAME = os.getenv("PUP_USER", "example@example.com")
 PASSWORD = os.getenv("PUP_PASS", "password123")
 SCREENSHOT_DIR = "screenshots"
