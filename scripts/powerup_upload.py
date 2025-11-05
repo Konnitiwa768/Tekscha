@@ -12,7 +12,7 @@ os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # ダウンロード対象 URL と保存先　
-FILE_URL =  "https://github.com/GotembaYuka/Gote-Supporter/releases/download/v1.7.3/Gote-Supporter_v1.7.3.mcpack"#"https://github.com/Konnitiwa768/Tekscha/raw/refs/heads/main/releases/Bedwars_Mega.mcpack"#https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
+FILE_URL = "https://files3.cdn9mc.com/index.php?act=dl&id=1698212281" #"https://github.com/GotembaYuka/Gote-Supporter/releases/download/v1.7.3/Gote-Supporter_v1.7.3.mcpack"#"https://github.com/Konnitiwa768/Tekscha/raw/refs/heads/main/releases/Bedwars_Mega.mcpack"#https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
 FILE_NAME = "i.zip"
 FILE_PATH = os.path.join(DOWNLOAD_DIR, FILE_NAME)
 
