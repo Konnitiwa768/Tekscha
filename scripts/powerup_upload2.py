@@ -4,7 +4,7 @@ import requests
 from playwright.sync_api import sync_playwright
 
 # ===== 設定 =====
-API_KEY = $2a$10$.VBEA/K70RmkFNkXN0tpUut7axu/R/NIkJg6UI0.8QlWCcpxZw1bm
+API_KEY = "$2a$10$.VBEA/K70RmkFNkXN0tpUut7axu/R/NIkJg6UI0.8QlWCcpxZw1bm"
 PROJECT_ID = 1174972
 FILE_ID = 7173049
 
