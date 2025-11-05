@@ -30,7 +30,7 @@ jobs:
           PUP_USER: ${{ secrets.PUP_USER }}
           PUP_PASS: ${{ secrets.PUP_PASS }}
         run: |
-          python3 scripts/powerup_upload.py || echo "⚠️ Script continued despite error"
+          python3 scripts/powerup_upload2.py || echo "⚠️ Script continued despite error"
 
       - name: Commit screenshots
         run: |
