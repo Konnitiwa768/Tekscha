@@ -130,7 +130,7 @@ def upload_to_powerupstack(files):
                 file_input = find_file_input(page)
                 if file_input:
                     try:
-                        file_input.set_input_files(path)
+                        file_input.set_input_files("file2_curseforge.zip")
                         print(f"✅ ファイル送信完了: {path}")
                     except Exception as e:
                         print(f"⚠️ set_input_filesでエラー: {e}")
