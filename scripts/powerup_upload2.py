@@ -7,101 +7,107 @@ from playwright.sync_api import sync_playwright
 API_KEY = "$2a$10$.VBEA/K70RmkFNkXN0tpUut7axu/R/NIkJg6UI0.8QlWCcpxZw1bm"
 USERNAME = os.getenv("PUP_USER", "example@example.com")
 PASSWORD = os.getenv("PUP_PASS", "password123")
-SCREENSHOT_DIR = "screenshots"
+
 DOWNLOAD_DIR = "downloads"
-
-os.makedirs(SCREENSHOT_DIR, exist_ok=True)
+SCREENSHOT_DIR = "screenshots"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 
-# ===== 対象ファイルリスト =====
 FILES = [
-    {"project_id": 1174972, "file_id": 7173049, "name": "file1_curseforge.zip"},
-    {"project_id": 1152638, "file_id": 6994787, "name": "file2_curseforge.zip"},
-    {"project_id": 1083023, "file_id": 6365190, "name": "file3_curseforge.zip"},
+    {"project_id": 1174972, "file_id": 7173049, "name": "file1.zip"},
+    {"project_id": 1152638, "file_id": 6994787, "name": "file2.zip"},
+    {"project_id": 1083023, "file_id": 6365190, "name": "file3.zip"},
 ]
 
 
-# ===== CurseForgeダウンロード関数 =====
-def download_from_curseforge(project_id, file_id, filename):
-    file_path = os.path.join(DOWNLOAD_DIR, filename)
+# ===== ユーティリティ =====
+def log(msg: str):
+    print(f"[{time.strftime('%H:%M:%S')}] {msg}")
 
-    if os.path.exists(file_path):
-        print(f"✔ 既に存在: {file_path}")
-        return file_path
 
-    print(f"📡 CurseForgeからダウンロードURL取得中: project={project_id}, file={file_id}")
+# ===== CurseForgeダウンロード =====
+def download_one(project_id: int, file_id: int, name: str) -> str | None:
+    if not API_KEY:
+        log("❌ CURSEFORGE_API_KEY が未設定です。")
+        return None
+
+    dest = os.path.join(DOWNLOAD_DIR, name)
+    if os.path.exists(dest):
+        log(f"✔ 既存ファイル検出: {dest}")
+        return dest
+
     url = f"https://api.curseforge.com/v1/mods/{project_id}/files/{file_id}/download-url"
     headers = {"x-api-key": API_KEY}
 
-    resp = requests.get(url, headers=headers)
-    if resp.status_code != 200:
-        raise Exception(f"URL取得失敗: {resp.status_code} {resp.text}")
+    log(f"📡 CurseForge: {project_id}/{file_id} URL取得中...")
+    r = requests.get(url, headers=headers, timeout=15)
+    if r.status_code == 403:
+        log("❌ 403 Forbidden — APIキーが無効です。")
+        return None
+    if r.status_code != 200:
+        log(f"⚠️ URL取得失敗: {r.status_code}")
+        return None
 
-    download_url = resp.json().get("data")
-    if not download_url:
-        raise Exception("ダウンロードURLを取得できませんでした。")
+    dl = r.json().get("data")
+    if not dl:
+        log("⚠️ URLデータが空です。")
+        return None
 
-    print(f"📥 ダウンロード開始: {download_url}")
-    r = requests.get(download_url, stream=True)
-    r.raise_for_status()
-
-    with open(file_path, "wb") as f:
-        for chunk in r.iter_content(8192):
-            f.write(chunk)
-    print(f"✅ ダウンロード完了: {file_path}")
-    return file_path
-
-
-# ===== Upload要素探索 =====
-def find_upload_target(page):
-    selectors = [
-        'button:has-text("U")', 'button:has-text("u")',
-        'input[aria-label*="U"]', 'input[aria-label*="u"]',
-        'input[title*="U"]', 'input[title*="u"]',
-        'input[name*="U"]', 'input[name*="u"]',
-        '[class*="U"]', '[class*="u"]',
-        '[data-tooltip*="U"]', '[data-tooltip*="u"]',
-        'text=/.*[Uu].*/',
-    ]
-    for sel in selectors:
-        btn = page.query_selector(sel)
-        if btn:
-            print(f"✔ Upload要素検出: {sel}")
-            return btn
-    print("⚠️ Upload要素が見つかりません。")
-    return None
+    log(f"⬇️ ダウンロード開始: {dl}")
+    with requests.get(dl, stream=True, timeout=60) as resp:
+        resp.raise_for_status()
+        with open(dest, "wb") as f:
+            for chunk in resp.iter_content(8192):
+                f.write(chunk)
+    log(f"✅ ダウンロード完了: {dest}")
+    return dest
 
 
-def find_file_input(page):
-    file_input = page.query_selector('input[type="file"]')
-    if file_input:
-        print("✔ input[type=file] 検出")
-        return file_input
-    print("⚠️ input[type=file] が見つかりません")
-    return None
+# ===== PowerUpStackアップロード =====
+def upload_one(page, path: str):
+    log(f"📤 アップロード開始: {path}")
+
+    try:
+        input_box = page.query_selector('input[type="file"]')
+        if not input_box:
+            log("⚠️ input[type=file]が見つからないためリロード")
+            page.reload()
+            page.wait_for_load_state("networkidle")
+            input_box = page.query_selector('input[type="file"]')
+
+        if not input_box:
+            log("❌ アップロード入力が見つかりません。スキップ。")
+            return False
+
+        input_box.set_input_files(path)
+        log(f"✅ ファイル送信済み: {os.path.basename(path)}")
+        time.sleep(8)
+        page.screenshot(path=f"{SCREENSHOT_DIR}/{os.path.basename(path)}.png")
+        return True
+    except Exception as e:
+        log(f"⚠️ アップロードエラー: {e}")
+        return False
 
 
-# ===== PowerUpStackアップロード関数 =====
-def upload_to_powerupstack(files):
+# ===== メイン（完全逐次） =====
+def main():
+    if not API_KEY:
+        log("❌ 環境変数 CURSEFORGE_API_KEY が未設定です。終了。")
+        return
+
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        browser = p.chromium.launch(headless=True)
         context = browser.new_context()
         page = context.new_page()
 
-        print("🌐 ログインページへアクセス中...")
+        log("🌐 PowerUpStackログインページへアクセス")
         page.goto("https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi5/files?path=behavior_packs")
         page.wait_for_load_state("networkidle")
-        page.screenshot(path=f"{SCREENSHOT_DIR}/01_login_page.png")
 
-        # ログイン
         inputs = page.query_selector_all("input")
         if len(inputs) >= 2:
             inputs[0].fill(USERNAME)
             inputs[1].fill(PASSWORD)
-            print("✔ ログイン情報入力完了")
-        else:
-            raise Exception("⚠️ 入力欄が2つ未満です。")
-
         login_btn = page.query_selector("button:has-text('Login')")
         if login_btn:
             login_btn.click()
@@ -109,50 +115,26 @@ def upload_to_powerupstack(files):
             inputs[1].press("Enter")
 
         page.wait_for_load_state("networkidle")
-        time.sleep(2)
-        page.screenshot(path=f"{SCREENSHOT_DIR}/02_after_login.png")
+        log("✔ ログイン完了")
+        page.screenshot(path=f"{SCREENSHOT_DIR}/login_done.png")
 
-        # 各ファイルを順番にアップロード
-        for i, path in enumerate(files, start=1):
-            print(f"📤 アップロード開始: {path}")
-            for retry in range(5):
-                upload_btn = find_upload_target(page)
-                if upload_btn:
-                    upload_btn.click()
-                    print("✔ Uploadボタンクリック成功")
-                    time.sleep(1)
-                    break
-                time.sleep(1)
-                page.reload()
+        # ---- 完全逐次処理 ----
+        for i, f in enumerate(FILES, start=1):
+            log(f"\n===== ステップ {i}/{len(FILES)} =====")
+            path = download_one(f["project_id"], f["file_id"], f["name"])
+            if not path:
+                log("⚠️ ダウンロード失敗 → スキップ")
+                continue
 
-            file_input = None
-            for retry in range(5):
-                file_input = find_file_input(page)
-                if file_input:
-                    try:
-                        file_input.set_input_files("file2_curseforge.zip")
-                        print(f"✅ ファイル送信完了: {path}")
-                    except Exception as e:
-                        print(f"⚠️ set_input_filesでエラー: {e}")
-                    break
-                time.sleep(1)
-                page.reload()
+            ok = upload_one(page, path)
+            if ok:
+                log(f"🎉 {f['name']} のアップロード完了")
+            else:
+                log(f"⚠️ {f['name']} のアップロードに失敗")
+            time.sleep(4)  # ステップ間のインターバル
 
-            time.sleep(10)
-            page.screenshot(path=f"{SCREENSHOT_DIR}/upload_{i}.png")
-
-        print("🎉 すべてのファイルをアップロード完了")
+        log("\n🌟 すべての段階完了。")
         browser.close()
-
-
-# ===== メイン =====
-def main():
-    paths = []
-    for f in FILES:
-        path = download_from_curseforge(f["project_id"], f["file_id"], f["name"])
-        paths.append(path)
-
-    upload_to_powerupstack(paths)
 
 
 if __name__ == "__main__":
