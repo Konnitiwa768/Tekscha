@@ -1,0 +1,45 @@
+name: PowerUpStack Level.dat Sync
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  sync-leveldat:
+    runs-on: ubuntu-latest
+    env:
+      PUP_USER: ${{ secrets.PUP_USER }}
+      PUP_PASS: ${{ secrets.PUP_PASS }}
+    steps:
+      - name: チェックアウト
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Python セットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 依存関係インストール
+        run: |
+          pip install playwright
+          playwright install chromium
+
+      - name: level.dat ダウンロード
+        run: python D.py
+
+      - name: Git 設定・Pull・コミット
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "actions@github.com"
+          git add downloads/level.dat || true
+          git pull
+          git commit -m "Update level.dat from PowerUpStack" || echo "No changes to commit"
+
+      - name: Push to main
+        run: |
+          git push
