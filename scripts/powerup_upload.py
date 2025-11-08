@@ -12,8 +12,8 @@ os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # ダウンロード対象 URL と保存先　
-FILE_URL = "https://Konnitiwa768.gitiub.io/Tekscha/src/diamond_2.png"#"https://raw.githubusercontent.com/Konnitiwa768/PVPVe/c81d8dcff7e1696f525ebb78f117adb0eb174c64/RP/textures/models/armor/marisa_layer_1.png" #"https://github.com/GotembaYuka/Gote-Supporter/releases/download/v1.7.3/Gote-Supporter_v1.7.3.mcpack"#"https://github.com/Konnitiwa768/Tekscha/raw/refs/heads/main/releases/Bedwars_Mega.mcpack"#https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
-FILE_NAME = "momongaite_2.png"
+FILE_URL = "https://Konnitiwa768.gitiub.io/Tekscha/src/diamond_1.png"#"https://raw.githubusercontent.com/Konnitiwa768/PVPVe/c81d8dcff7e1696f525ebb78f117adb0eb174c64/RP/textures/models/armor/marisa_layer_1.png" #"https://github.com/GotembaYuka/Gote-Supporter/releases/download/v1.7.3/Gote-Supporter_v1.7.3.mcpack"#"https://github.com/Konnitiwa768/Tekscha/raw/refs/heads/main/releases/Bedwars_Mega.mcpack"#https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
+FILE_NAME = "momongaite_1.png"
 FILE_PATH = os.path.join(DOWNLOAD_DIR, FILE_NAME)
 
 
