@@ -1,0 +1,62 @@
+{
+  "phyle": {
+    "format_version": "1.12.0",
+    "minecraft:geometry": [
+      {
+        "description": {
+          "identifier": "geometry.phyle",
+          "texture_width": 64,
+          "texture_height": 64,
+          "visible_bounds_width": 2,
+          "visible_bounds_height": 2,
+          "visible_bounds_offset": [
+            0,
+            1,
+            0
+          ]
+        },
+        "bones": []
+      }
+    ]
+  },
+  "troivjuer": {
+    "format_version": "1.12.0",
+    "minecraft:geometry": [
+      {
+        "description": {
+          "identifier": "geometry.troivjuer",
+          "texture_width": 64,
+          "texture_height": 64,
+          "visible_bounds_width": 2,
+          "visible_bounds_height": 2,
+          "visible_bounds_offset": [
+            0,
+            1,
+            0
+          ]
+        },
+        "bones": []
+      }
+    ]
+  },
+  "nihdun": {
+    "format_version": "1.12.0",
+    "minecraft:geometry": [
+      {
+        "description": {
+          "identifier": "geometry.nihdun",
+          "texture_width": 64,
+          "texture_height": 64,
+          "visible_bounds_width": 2,
+          "visible_bounds_height": 2,
+          "visible_bounds_offset": [
+            0,
+            1,
+            0
+          ]
+        },
+        "bones": []
+      }
+    ]
+  }
+}
