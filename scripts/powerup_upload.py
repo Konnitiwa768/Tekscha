@@ -76,7 +76,7 @@ def main():
 
         # === STEP 1: ログインページ ===
         page.goto(
-            "https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi5/files?path=resource_packs%2FRP%2Ftextures%2Fmodels%2Farmor
+            "https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi5/files?path=resource_packs%2FRP%2Ftextures%2Fmodels%2Farmor"
         )
         page.wait_for_load_state("networkidle")
         page.screenshot(path=f"{SCREENSHOT_DIR}/01_login_page.png")
