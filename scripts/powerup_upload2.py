@@ -66,7 +66,7 @@ def main():
         page = context.new_page()
 
         log("🌐 PowerUpStack ログインページにアクセス")
-        page.goto("https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi5/files?path=resource_packs/RP/sounds")
+        page.goto("https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi5/files?path=resource_packs%2FRP%2Fsounds")
         page.wait_for_load_state("networkidle")
 
         inputs = page.query_selector_all("input")
