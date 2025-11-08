@@ -36,7 +36,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-          　git pull
             git commit -m "Update Bedrock samples v1.21.120.4"
             git push
           fi
