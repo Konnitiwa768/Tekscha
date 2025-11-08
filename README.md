@@ -1,9 +1,7 @@
-# Tekscha
-https://linkvertise.com/193501/DurabilityViewerV111?o=sharing
-ん
-https://Konnitiwa768.Github.io/Astedmm/A.html
-https://www.mediafire.com/file/a77tav57wf1x8si/%25C2%25A7bNebula_%25C2%25A78%255B%25C2%25A7f16%25C2%25A7bx%25C2%25A78%255D.zip/file
-https://konnitiwa768.github.io/Tekscha/releases/Bedwars_Mega.mcpack
-https://chatgpt.com
-https://google.com
-https://www.mediafire.com/file/2w7o9a7ncctn4yi/BlackFade_%255B128x%255D.mcpack.zip/file
+## Bedrock Add-On Sample Files
+
+The following sample files provide the latest resource and behavior examples for creating Add-Ons for Minecraft: Bedrock Edition. The source of these files is available at https://github.com/mojang/bedrock-samples. For more information on how to create Add-Ons for Minecraft, please visit https://minecraft.net/creator and https://learn.microsoft.com/minecraft/creator.
+
+You can see versions of this documentation corresponding to the latest previews in the [preview branch](https://github.com/Mojang/bedrock-samples/tree/preview).
+
+A version of the main documentation can also be found at [https://mojang.github.io/bedrock-samples/](https://mojang.github.io/bedrock-samples/).
