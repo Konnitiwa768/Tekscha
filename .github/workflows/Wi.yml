@@ -27,8 +27,8 @@ jobs:
 
       - name: Generate Leafeau Textures
         run: |
-          convert diamond_1.png -fill "#44cc99" -colorize 75% src/diamond_1.png
-          convert diamond_2.png -fill "#44cc99" -colorize 75% src/diamond_2.png
+          convert diamond_1.png -fill "#cc22cc" -colorize 75% src/diamond_1.png
+          convert diamond_2.png -fill "#cc22cc" -colorize 75% src/diamond_2.png
 
       - name: Commit and Push Changes
         env:
