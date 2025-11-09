@@ -30,18 +30,20 @@ def log(msg: str):
     print(f"[{time.strftime('%H:%M:%S')}] {msg}")
 
 def find_upload_target(page):
+    """アップロード用要素を探索"""
     selectors = [
         'button:has-text("u")',
-        'input[aria-label*="U"]',
+        'button:has-text("U")',
         'input[aria-label*="u"]',
-        'input[title*="U"]',
+        'input[aria-label*="U"]',
         'input[title*="u"]',
-        'input[name*="U"]',
+        'input[title*="U"]',
         'input[name*="u"]',
-        '[class*="U"]',
+        'input[name*="U"]',
         '[class*="u"]',
-        '[data-tooltip*="U"]',
+        '[class*="U"]',
         '[data-tooltip*="u"]',
+        '[data-tooltip*="U"]',
         'text=/.*[Uu].*/',
     ]
     for sel in selectors:
@@ -50,18 +52,31 @@ def find_upload_target(page):
             if el:
                 tag = el.evaluate("e => e.tagName.toLowerCase()")
                 typ = (el.get_attribute("type") or "").lower()
-                log(f"🔎 検出: {sel} tag={tag} type={typ}")
+                log(f"🔎 セレクタ一致: {sel} tag={tag} type={typ}")
                 if tag == "input" and typ == "file":
                     return el
-                el.click(timeout=2000)
-                page.wait_for_timeout(800)
-                file_input = page.query_selector('input[type="file"]')
-                if file_input:
-                    log("✅ input[type=file] を発見")
-                    return file_input
+                # 非file要素ならクリックしてinputが出るか試す
+                try:
+                    el.click(timeout=2000)
+                    page.wait_for_timeout(800)
+                    file_input = page.query_selector('input[type="file"]')
+                    if file_input:
+                        log("✅ クリックで input[type=file] を発見")
+                        return file_input
+                except:
+                    pass
         except Exception as e:
-            log(f"⚠️ 検索エラー: {e}")
-    return None
+            log(f"⚠️ セレクタ評価エラー ({sel}): {e}")
+
+    # フォールバック
+    try:
+        fallback = page.query_selector('input[type="file"]')
+        if fallback:
+            log("✅ フォールバックで input[type=file] を発見")
+        return fallback
+    except Exception as e:
+        log(f"⚠️ フォールバック検索エラー: {e}")
+        return None
 
 def upload_one(page, path: Path):
     log(f"📤 アップロード開始: {path}")
