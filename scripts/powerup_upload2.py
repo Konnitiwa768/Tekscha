@@ -7,30 +7,18 @@ from playwright.sync_api import sync_playwright
 USERNAME = os.getenv("PUP_USER", "example@example.com")
 PASSWORD = os.getenv("PUP_PASS", "password123")
 
-# 手作業で生成・配置したファイルのパス
-UPLOAD_DIR = Path("resource_packs/RP/sounds")
+# アップロード元ディレクトリ
+SOUNDS_DIR = Path("sounds")  # 全 mp3 をここから拾う
+JSON_DIR = Path("assets/myaddon/sounds")  # ここにある *.json を拾う
+
 SCREENSHOT_DIR = Path("screenshots")
 SCREENSHOT_DIR.mkdir(exist_ok=True)
-
-# ファイルを1つずつ手動で指定する場合
-files = [
-    UPLOAD_DIR / "phyle_idle.mp3",
-    UPLOAD_DIR / "phyle_hurt.mp3",
-    UPLOAD_DIR / "phyle_death.mp3",
-    UPLOAD_DIR / "troivjuer_idle.mp3",
-    UPLOAD_DIR / "troivjuer_hurt.mp3",
-    UPLOAD_DIR / "troivjuer_death.mp3",
-    UPLOAD_DIR / "nihdun_idle.mp3",
-    UPLOAD_DIR / "nihdun_hurt.mp3",
-    UPLOAD_DIR / "nihdun_death.mp3",
-    UPLOAD_DIR / "sounds.json",
-]
 
 def log(msg: str):
     print(f"[{time.strftime('%H:%M:%S')}] {msg}")
 
 def upload_one(page, path: Path):
-    log(f"📤 アップロード開始: {path.name}")
+    log(f"📤 アップロード開始: {path}")
     try:
         input_box = page.query_selector('input[type="file"]')
         if not input_box:
@@ -43,15 +31,27 @@ def upload_one(page, path: Path):
             return False
         input_box.set_input_files(str(path))
         log(f"✅ ファイル送信済み: {path.name}")
-        time.sleep(6)  # アップロード待機
-        page.screenshot(path=SCREENSHOT_DIR / f"{path.name}.png")
+        time.sleep(6)  # アップロード待機（必要に応じて調整）
+        # スクリーンショットはファイル名に日時を含めて衝突回避
+        shot_name = f"{int(time.time())}_{path.name}.png"
+        page.screenshot(path=SCREENSHOT_DIR / shot_name)
         return True
     except Exception as e:
         log(f"⚠️ アップロードエラー: {e}")
         return False
 
 def main():
-    # ファイル存在チェック
+    # ファイル一覧を収集（mp3 と json）
+    mp3_files = sorted(SOUNDS_DIR.glob("*.mp3"))
+    json_files = sorted(JSON_DIR.glob("*.json"))
+
+    files = mp3_files + json_files
+
+    if not files:
+        log("❌ アップロード対象のファイルが見つかりません。SOUNDS_DIR と JSON_DIR を確認してください。")
+        return
+
+    # 存在チェック（念のため）
     for f in files:
         if not f.exists():
             log(f"❌ ファイルが存在しません: {f}")
@@ -63,6 +63,7 @@ def main():
         page = context.new_page()
 
         log("🌐 PowerUpStack ログインページにアクセス")
+        # 必要に応じて redirect URL を修正してください
         page.goto(
             "https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi5/files?path=resource_packs/RP/sounds"
         )
@@ -76,6 +77,7 @@ def main():
         if login_btn:
             login_btn.click()
         else:
+            # Enter で送信
             inputs[1].press("Enter")
 
         page.wait_for_load_state("networkidle")
@@ -92,7 +94,7 @@ def main():
                 log(f"⚠️ {file_path.name} のアップロードに失敗")
             time.sleep(3)
 
-        log("\n🌟 すべての MP3 と sounds.json のアップロード完了")
+        log("\n🌟 すべての MP3 と JSON のアップロード完了")
         browser.close()
 
 if __name__ == "__main__":
