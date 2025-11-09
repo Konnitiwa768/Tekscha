@@ -1,4 +1,4 @@
-name: Generate Leafeau Textures
+name: Generate Multi Textures
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
       
 jobs:
-  generate_leafeau_textures:
+  generate_textures:
     runs-on: ubuntu-latest
 
     steps:
@@ -14,21 +14,35 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install ImageMagick
-        run: sudo apt-get update && sudo apt-get install -y imagemagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
 
-      - name: Download Zephyr Texture
+      - name: Download Base Textures
         run: |
           curl -O https://raw.githubusercontent.com/Mojang/bedrock-samples/main/resource_pack/textures/models/armor/diamond_1.png
           curl -O https://raw.githubusercontent.com/Mojang/bedrock-samples/main/resource_pack/textures/models/armor/diamond_2.png
-    
 
       - name: Prepare Output Directory
         run: mkdir -p src/
 
-      - name: Generate Leafeau Textures
+      - name: Generate All Variant Textures
         run: |
-          convert diamond_1.png -fill "#cc22cc" -colorize 75% src/diamond_1.png
-          convert diamond_2.png -fill "#cc22cc" -colorize 75% src/diamond_2.png
+          # Leafeau（紫）
+          convert diamond_1.png -fill "#cc22cc" -colorize 75% src/leafeau_1.png
+          convert diamond_2.png -fill "#cc22cc" -colorize 75% src/leafeau_2.png
+
+          # Marumaru（白）
+          convert diamond_1.png -fill "#ffffff" -colorize 75% src/marumaru_1.png
+          convert diamond_2.png -fill "#ffffff" -colorize 75% src/marumaru_2.png
+
+          # Hachiwari（水色）
+          convert diamond_1.png -fill "#66ccff" -colorize 75% src/hachiwari_1.png
+          convert diamond_2.png -fill "#66ccff" -colorize 75% src/hachiwari_2.png
+
+          # Kani（ピンク）
+          convert diamond_1.png -fill "#ff66aa" -colorize 75% src/kani_1.png
+          convert diamond_2.png -fill "#ff66aa" -colorize 75% src/kani_2.png
 
       - name: Commit and Push Changes
         env:
@@ -40,8 +54,8 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git remote set-url origin https://x-access-token:${{ secrets.SECRET_TOKEN }}@github.com/${{ github.repository }}
-
+          
           git add src/
-          git commit -m "Generate Leafeau textures from crystal base" || echo "No changes to commit"
-          git pull --rebase origin main || echo "Pull failed (likely due to conflicts or clean state)"
+          git commit -m "Generate marumaru, hachiwari, kani, and leafeau textures" || echo "No changes to commit"
+          git pull --rebase origin main || echo "Pull skipped"
           git push origin HEAD:main
