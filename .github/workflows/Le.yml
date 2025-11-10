@@ -1,4 +1,4 @@
-name: Generate Distinct Mob Sounds MP3
+name: Generate Distinct Mob Sounds OGG
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y sox lame git jq
+          sudo apt-get install -y sox git jq
 
       - name: Generate distinct noise sounds
         run: |
@@ -39,7 +39,8 @@ jobs:
                   sox -n -r 44100 -c 2 "$fname" synth $len saw vol $vol
                   ;;
               esac
-              lame -V2 "$fname" "${fname%.wav}.mp3"
+              # WAV → OGG に変換
+              sox "$fname" "sounds/${mob}_${type}.ogg"
               rm "$fname"
             done
           done
@@ -63,7 +64,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add sounds/*.mp3 assets/myaddon/sounds/sounds.json
+          git add sounds/*.ogg assets/myaddon/sounds/sounds.json
           git pull
-          git commit -m "Generate distinct mob noises MP3 and sounds.json"
+          git commit -m "Generate distinct mob noises OGG and sounds.json"
           git push
