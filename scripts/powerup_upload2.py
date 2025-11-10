@@ -133,7 +133,7 @@ def upload_one(page, path: Path):
 
 def main():
     # ファイル一覧を収集（mp3 と json）
-    mp3_files = sorted(SOUNDS_DIR.glob("*.mp3"))
+    mp3_files = sorted(SOUNDS_DIR.glob("*.ogg"))
     json_files = sorted(JSON_DIR.glob("*.json"))
 
     files = mp3_files + json_files
