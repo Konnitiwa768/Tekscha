@@ -27,6 +27,7 @@ jobs:
             mkdir -p releases
             mv Bedwars_Mega2.mcpack releases/
             git add releases/Bedwars_Mega2.mcpack
+            git pull
             git commit -m "Auto-build: Bedwars Mega MCPack updated"
             git push
           else
