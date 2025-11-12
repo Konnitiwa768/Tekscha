@@ -1,0 +1,50 @@
+name: Convert Pack to Gray (BE Resource Pack)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  gray_pack:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y imagemagick
+
+      - name: Prepare output directory
+        run: |
+          rm -rf Pack2
+          mkdir -p Pack2
+
+      - name: Convert all images to faint gray
+        run: |
+          shopt -s globstar nullglob
+          for file in Pack/**/*.{png,jpg,jpeg,tga,bmp}; do
+            [ -f "$file" ] || continue
+            out="Pack2/${file#Pack/}"
+            mkdir -p "$(dirname "$out")"
+            # 1. グレースケール化 (-colorspace Gray)
+            # 2. 明度を少し上げて（灰色寄りに）視認性を残す (-modulate 120,0,100)
+            # 3. 透過を保持 (-alpha on)
+            convert "$file" -colorspace Gray -modulate 120,0,100 "$out"
+          done
+
+      - name: Copy non-image files (manifest.jsonなど)
+        run: |
+          rsync -av --exclude='*.png' --exclude='*.jpg' --exclude='*.jpeg' \
+            --exclude='*.tga' --exclude='*.bmp' Pack/ Pack2/
+
+      - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Pack2/
+          git commit -m "Generate grayscale version of Pack -> Pack2" || echo "No changes to commit"
+          git push
