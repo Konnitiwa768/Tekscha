@@ -23,7 +23,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          if [ -f Bedwars_Mega2.mcpack2 ]; then
+          if [ -f Bedwars_Mega2.mcpack ]; then
             mkdir -p releases
             mv Bedwars_Mega2.mcpack releases/
             git add releases/Bedwars_Mega2.mcpack
