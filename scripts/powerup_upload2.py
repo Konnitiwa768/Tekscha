@@ -25,7 +25,6 @@ FILES = [
     {"project_id": 1364457, "file_id": 7198015, "name": "file9.zip"},
 ]
 
-
 def log(msg: str):
     print(f"[{time.strftime('%H:%M:%S')}] {msg}")
 
@@ -91,10 +90,6 @@ def process_file9(zip_path: str) -> list[str]:
 
         # 直下に render_controllers や manifest.json がある → 再構成が必要
         contents = os.listdir(mcpack_extract_dir)
-        has_loose_root = any(
-            os.path.isfile(os.path.join(mcpack_extract_dir, f)) or os.path.isdir(os.path.join(mcpack_extract_dir, f))
-            for f in contents
-        )
 
         # 正しいフォルダ構造にまとめる
         rebuilt_dir = os.path.join(temp_root, name_without_ext)
@@ -138,7 +133,11 @@ def upload_one(page, path: str):
         input_box.set_input_files(path)
         log(f"✅ ファイル送信済み: {os.path.basename(path)}")
         time.sleep(8)
-        page.screenshot(path=f"{SCREENSHOT_DIR}/{os.path.basename(path)}.png")
+
+        # --- 修正済み: スクリーンショット名から拡張子除去 ---
+        base_name = os.path.splitext(os.path.basename(path))[0]
+        page.screenshot(path=f"{SCREENSHOT_DIR}/{base_name}.png")
+
         return True
     except Exception as e:
         log(f"⚠️ アップロードエラー: {e}")
@@ -168,6 +167,8 @@ def main():
 
         page.wait_for_load_state("networkidle")
         log("✔ ログイン完了")
+
+        # ログイン完了スクリーンショット
         page.screenshot(path=f"{SCREENSHOT_DIR}/login_done.png")
 
         for i, f in enumerate(FILES, start=1):
