@@ -9,7 +9,7 @@ DOWNLOAD_DIR = "downloads"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 def find_download_button(page):
-    """複数の候補セレクタを順に試す"""
+    """複数の候補セレクタを順に試すぅ"""
     selectors = [
         'button:has-text("Download")',
         'button:has-text("DOWNLOAD")',
