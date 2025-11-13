@@ -2,6 +2,7 @@ import os
 import time
 import zipfile
 import shutil
+import json
 import requests
 from playwright.sync_api import sync_playwright
 
@@ -60,22 +61,23 @@ def download_one(project_id: int, file_id: int, name: str) -> str | None:
 
 
 # ===== file9 特殊処理 =====
-def process_file9(zip_path: str) -> list[str]:
+def process_file9(zip_path: str) -> dict[str, list[str]]:
+    """
+    RP/BPに分類してまとめ、zipを再構成
+    戻り値: {"RP": [...], "BP": [...]}
+    """
     log(f"🧩 特殊処理: {zip_path} を展開中…")
-
     temp_root = os.path.join(TEMP_DIR, "file9_work")
     if os.path.exists(temp_root):
         shutil.rmtree(temp_root)
     os.makedirs(temp_root)
 
-    # 第一段階: file9.zip 展開
     with zipfile.ZipFile(zip_path, "r") as z:
         z.extractall(temp_root)
     log("📦 file9.zip 展開完了")
 
-    output_files = []
+    output_files = {"RP": [], "BP": []}
 
-    # 中の .mcpack をそれぞれ展開
     for item in os.listdir(temp_root):
         if not item.endswith(".mcpack"):
             continue
@@ -88,28 +90,32 @@ def process_file9(zip_path: str) -> list[str]:
             z.extractall(mcpack_extract_dir)
         log(f"📂 {item} 展開完了")
 
-        # 直下に render_controllers や manifest.json がある → 再構成が必要
-        contents = os.listdir(mcpack_extract_dir)
+        # manifest.json を読み込んで種類判定
+        manifest_file = os.path.join(mcpack_extract_dir, "manifest.json")
+        with open(manifest_file, "r", encoding="utf-8") as f:
+            manifest = json.load(f)
+        type_module = manifest.get("modules", [{}])[0].get("type", "resources")
+        if type_module == "data":
+            parent_dir = os.path.join(DOWNLOAD_DIR, "SpearBP")
+            category = "BP"
+        else:
+            parent_dir = os.path.join(DOWNLOAD_DIR, "SpearRP")
+            category = "RP"
 
-        # 正しいフォルダ構造にまとめる
-        rebuilt_dir = os.path.join(temp_root, name_without_ext)
-        if os.path.exists(rebuilt_dir):
-            shutil.rmtree(rebuilt_dir)
-        os.makedirs(rebuilt_dir)
+        target_dir = os.path.join(parent_dir, name_without_ext)
+        if os.path.exists(target_dir):
+            shutil.rmtree(target_dir)
+        os.makedirs(target_dir, exist_ok=True)
 
-        for entry in contents:
-            src = os.path.join(mcpack_extract_dir, entry)
-            dst = os.path.join(rebuilt_dir, entry)
-            shutil.move(src, dst)
-        log(f"📁 構成整形済み: {rebuilt_dir}")
+        for entry in os.listdir(mcpack_extract_dir):
+            shutil.move(os.path.join(mcpack_extract_dir, entry), os.path.join(target_dir, entry))
 
-        # zipとして再作成
-        rebuilt_zip = os.path.join(DOWNLOAD_DIR, f"{name_without_ext}.zip")
+        rebuilt_zip = os.path.join(parent_dir, f"{name_without_ext}.zip")
         if os.path.exists(rebuilt_zip):
             os.remove(rebuilt_zip)
-        shutil.make_archive(rebuilt_zip.replace(".zip", ""), "zip", rebuilt_dir)
+        shutil.make_archive(rebuilt_zip.replace(".zip", ""), "zip", target_dir)
         log(f"🗜 再構成zip作成: {rebuilt_zip}")
-        output_files.append(rebuilt_zip)
+        output_files[category].append(rebuilt_zip)
 
     log(f"✅ file9特殊処理完了: {output_files}")
     return output_files
@@ -134,10 +140,8 @@ def upload_one(page, path: str):
         log(f"✅ ファイル送信済み: {os.path.basename(path)}")
         time.sleep(8)
 
-        # --- 修正済み: スクリーンショット名から拡張子除去 ---
         base_name = os.path.splitext(os.path.basename(path))[0]
         page.screenshot(path=f"{SCREENSHOT_DIR}/{base_name}.png")
-
         return True
     except Exception as e:
         log(f"⚠️ アップロードエラー: {e}")
@@ -152,7 +156,7 @@ def main():
         page = context.new_page()
 
         log("🌐 PowerUpStackログインページへアクセス")
-        page.goto("https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi5/files?path=resource_packs")
+        page.goto("https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi5/files")
         page.wait_for_load_state("networkidle")
 
         inputs = page.query_selector_all("input")
@@ -167,8 +171,6 @@ def main():
 
         page.wait_for_load_state("networkidle")
         log("✔ ログイン完了")
-
-        # ログイン完了スクリーンショット
         page.screenshot(path=f"{SCREENSHOT_DIR}/login_done.png")
 
         for i, f in enumerate(FILES, start=1):
@@ -181,10 +183,21 @@ def main():
             # file9のみ特殊処理
             if f["name"] == "file9.zip":
                 extracted_files = process_file9(path)
-                for ef in extracted_files:
-                    upload_one(page, ef)
-                    time.sleep(4)
+                # RP/BPごとにアップロード
+                for category, files_list in extracted_files.items():
+                    # 適切なURLに移動
+                    if category == "RP":
+                        page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=resource_packs")
+                    else:
+                        page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=behavior_packs")
+                    page.wait_for_load_state("networkidle")
+                    for ef in files_list:
+                        upload_one(page, ef)
+                        time.sleep(4)
             else:
+                # 他ファイルはRPと仮定して resource_packs にアップロード
+                page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=resource_packs")
+                page.wait_for_load_state("networkidle")
                 upload_one(page, path)
                 time.sleep(4)
 
