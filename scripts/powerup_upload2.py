@@ -63,7 +63,7 @@ def download_one(project_id: int, file_id: int, name: str) -> str | None:
 # ===== file9 特殊処理 =====
 def process_file9(zip_path: str) -> dict[str, list[str]]:
     """
-    RP/BPに分類してまとめ、zipを再構成
+    RP/BP に分類して zip を再構成
     戻り値: {"RP": [...], "BP": [...]}
     """
     log(f"🧩 特殊処理: {zip_path} を展開中…")
@@ -72,6 +72,7 @@ def process_file9(zip_path: str) -> dict[str, list[str]]:
         shutil.rmtree(temp_root)
     os.makedirs(temp_root)
 
+    # file9.zip 展開
     with zipfile.ZipFile(zip_path, "r") as z:
         z.extractall(temp_root)
     log("📦 file9.zip 展開完了")
@@ -90,7 +91,7 @@ def process_file9(zip_path: str) -> dict[str, list[str]]:
             z.extractall(mcpack_extract_dir)
         log(f"📂 {item} 展開完了")
 
-        # manifest.json を読み込んで種類判定
+        # manifest.json を読み込み type 判定
         manifest_file = os.path.join(mcpack_extract_dir, "manifest.json")
         with open(manifest_file, "r", encoding="utf-8") as f:
             manifest = json.load(f)
@@ -180,12 +181,10 @@ def main():
                 log("⚠️ ダウンロード失敗 → スキップ")
                 continue
 
-            # file9のみ特殊処理
             if f["name"] == "file9.zip":
                 extracted_files = process_file9(path)
-                # RP/BPごとにアップロード
+                # RP/BPごとに URL 移動してアップロード
                 for category, files_list in extracted_files.items():
-                    # 適切なURLに移動
                     if category == "RP":
                         page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=resource_packs")
                     else:
@@ -195,7 +194,6 @@ def main():
                         upload_one(page, ef)
                         time.sleep(4)
             else:
-                # 他ファイルはRPと仮定して resource_packs にアップロード
                 page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=resource_packs")
                 page.wait_for_load_state("networkidle")
                 upload_one(page, path)
