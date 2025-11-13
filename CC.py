@@ -3,7 +3,7 @@ import math
 import numpy as np
 from PIL import Image
 
-INPUT_PATH = "SP2.png"
+INPUT_PATH = "SP3.png"
 OUTPUT_DIR = "Pack2/textures/environment/overworld_cubemap"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
