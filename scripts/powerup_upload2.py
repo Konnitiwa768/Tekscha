@@ -1,5 +1,7 @@
 import os
 import time
+import zipfile
+import shutil
 import requests
 from playwright.sync_api import sync_playwright
 
@@ -10,29 +12,26 @@ PASSWORD = os.getenv("PUP_PASS", "password123")
 
 DOWNLOAD_DIR = "downloads"
 SCREENSHOT_DIR = "screenshots"
+TEMP_DIR = "temp_unpack"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
+os.makedirs(TEMP_DIR, exist_ok=True)
 
 FILES = [
     {"project_id": 1174972, "file_id": 7173049, "name": "file1.zip"},
     {"project_id": 1152638, "file_id": 6994787, "name": "file2.zip"},
     {"project_id": 1083023, "file_id": 6365190, "name": "file3.zip"},
     {"project_id": 993926, "file_id": 7159195, "name": "file4.zip"},
-    {"project_id": 1364457, "file_id": 7198015, "name": "file8.zip"}    
+    {"project_id": 1364457, "file_id": 7198015, "name": "file9.zip"},
 ]
 
 
-# ===== ユーティリティ =====
 def log(msg: str):
     print(f"[{time.strftime('%H:%M:%S')}] {msg}")
 
 
-# ===== CurseForgeダウンロード =====
+# ===== ダウンロード =====
 def download_one(project_id: int, file_id: int, name: str) -> str | None:
-    if not API_KEY:
-        log("❌ CURSEFORGE_API_KEY が未設定です。")
-        return None
-
     dest = os.path.join(DOWNLOAD_DIR, name)
     if os.path.exists(dest):
         log(f"✔ 既存ファイル検出: {dest}")
@@ -40,12 +39,8 @@ def download_one(project_id: int, file_id: int, name: str) -> str | None:
 
     url = f"https://api.curseforge.com/v1/mods/{project_id}/files/{file_id}/download-url"
     headers = {"x-api-key": API_KEY}
-
     log(f"📡 CurseForge: {project_id}/{file_id} URL取得中...")
     r = requests.get(url, headers=headers, timeout=15)
-    if r.status_code == 403:
-        log("❌ 403 Forbidden — APIキーが無効です。")
-        return None
     if r.status_code != 200:
         log(f"⚠️ URL取得失敗: {r.status_code}")
         return None
@@ -65,10 +60,69 @@ def download_one(project_id: int, file_id: int, name: str) -> str | None:
     return dest
 
 
-# ===== PowerUpStackアップロード =====
+# ===== file9 特殊処理 =====
+def process_file9(zip_path: str) -> list[str]:
+    log(f"🧩 特殊処理: {zip_path} を展開中…")
+
+    temp_root = os.path.join(TEMP_DIR, "file9_work")
+    if os.path.exists(temp_root):
+        shutil.rmtree(temp_root)
+    os.makedirs(temp_root)
+
+    # 第一段階: file9.zip 展開
+    with zipfile.ZipFile(zip_path, "r") as z:
+        z.extractall(temp_root)
+    log("📦 file9.zip 展開完了")
+
+    output_files = []
+
+    # 中の .mcpack をそれぞれ展開
+    for item in os.listdir(temp_root):
+        if not item.endswith(".mcpack"):
+            continue
+        mcpack_path = os.path.join(temp_root, item)
+        name_without_ext = os.path.splitext(item)[0]
+        mcpack_extract_dir = os.path.join(temp_root, f"{name_without_ext}_unpack")
+        os.makedirs(mcpack_extract_dir, exist_ok=True)
+
+        with zipfile.ZipFile(mcpack_path, "r") as z:
+            z.extractall(mcpack_extract_dir)
+        log(f"📂 {item} 展開完了")
+
+        # 直下に render_controllers や manifest.json がある → 再構成が必要
+        contents = os.listdir(mcpack_extract_dir)
+        has_loose_root = any(
+            os.path.isfile(os.path.join(mcpack_extract_dir, f)) or os.path.isdir(os.path.join(mcpack_extract_dir, f))
+            for f in contents
+        )
+
+        # 正しいフォルダ構造にまとめる
+        rebuilt_dir = os.path.join(temp_root, name_without_ext)
+        if os.path.exists(rebuilt_dir):
+            shutil.rmtree(rebuilt_dir)
+        os.makedirs(rebuilt_dir)
+
+        for entry in contents:
+            src = os.path.join(mcpack_extract_dir, entry)
+            dst = os.path.join(rebuilt_dir, entry)
+            shutil.move(src, dst)
+        log(f"📁 構成整形済み: {rebuilt_dir}")
+
+        # zipとして再作成
+        rebuilt_zip = os.path.join(DOWNLOAD_DIR, f"{name_without_ext}.zip")
+        if os.path.exists(rebuilt_zip):
+            os.remove(rebuilt_zip)
+        shutil.make_archive(rebuilt_zip.replace(".zip", ""), "zip", rebuilt_dir)
+        log(f"🗜 再構成zip作成: {rebuilt_zip}")
+        output_files.append(rebuilt_zip)
+
+    log(f"✅ file9特殊処理完了: {output_files}")
+    return output_files
+
+
+# ===== アップロード =====
 def upload_one(page, path: str):
     log(f"📤 アップロード開始: {path}")
-
     try:
         input_box = page.query_selector('input[type="file"]')
         if not input_box:
@@ -91,12 +145,8 @@ def upload_one(page, path: str):
         return False
 
 
-# ===== メイン（完全逐次） =====
+# ===== メイン =====
 def main():
-    if not API_KEY:
-        log("❌ 環境変数 CURSEFORGE_API_KEY が未設定です。終了。")
-        return
-
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         context = browser.new_context()
@@ -120,7 +170,6 @@ def main():
         log("✔ ログイン完了")
         page.screenshot(path=f"{SCREENSHOT_DIR}/login_done.png")
 
-        # ---- 完全逐次処理 ----
         for i, f in enumerate(FILES, start=1):
             log(f"\n===== ステップ {i}/{len(FILES)} =====")
             path = download_one(f["project_id"], f["file_id"], f["name"])
@@ -128,12 +177,15 @@ def main():
                 log("⚠️ ダウンロード失敗 → スキップ")
                 continue
 
-            ok = upload_one(page, path)
-            if ok:
-                log(f"🎉 {f['name']} のアップロード完了")
+            # file9のみ特殊処理
+            if f["name"] == "file9.zip":
+                extracted_files = process_file9(path)
+                for ef in extracted_files:
+                    upload_one(page, ef)
+                    time.sleep(4)
             else:
-                log(f"⚠️ {f['name']} のアップロードに失敗")
-            time.sleep(4)  # ステップ間のインターバル
+                upload_one(page, path)
+                time.sleep(4)
 
         log("\n🌟 すべての段階完了。")
         browser.close()
