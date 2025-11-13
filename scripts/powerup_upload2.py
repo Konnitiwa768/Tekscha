@@ -153,7 +153,7 @@ def main():
         page = context.new_page()
 
         log("🌐 PowerUpStackログインページへアクセス")
-        page.goto("https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi5/files?path=behavior_packs")
+        page.goto("https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi5/files?path=resource_packs")
         page.wait_for_load_state("networkidle")
 
         inputs = page.query_selector_all("input")
