@@ -186,9 +186,9 @@ def main():
                 # RP/BPごとに URL 移動してアップロード
                 for category, files_list in extracted_files.items():
                     if category == "RP":
-                        page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=resource_packs")
+                        page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=resource_packs%2Fspearrp")
                     else:
-                        page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=behavior_packs")
+                        page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=behavior_packs%2Fspearbp")
                     page.wait_for_load_state("networkidle")
                     for ef in files_list:
                         upload_one(page, ef)
