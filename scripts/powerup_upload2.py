@@ -18,7 +18,7 @@ FILES = [
     {"project_id": 1152638, "file_id": 6994787, "name": "file2.zip"},
     {"project_id": 1083023, "file_id": 6365190, "name": "file3.zip"},
     {"project_id": 993926, "file_id": 7159195, "name": "file4.zip"},
-    {"project_id": 993926, "file_id": 7159195, "name": "file4.zip"}    
+    {"project_id": 993926, "file_id": 7159195, "name": "file6.zip"}    
 ]
 
 
