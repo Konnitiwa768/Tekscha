@@ -1,0 +1,49 @@
+{
+  "format_version": "1.14.0",
+  "sound_definitions": {
+    "item.jl_spears:spear.attack": {
+      "category": "hostile",
+      "sounds": [
+        "sounds/jl/spears/item/spear/attack1",
+        "sounds/jl/spears/item/spear/attack2",
+        "sounds/jl/spears/item/spear/attack3"
+      ]
+    },
+    "item.jl_spears:spear.hit": {
+      "category": "hostile",
+      "sounds": [
+        "sounds/jl/spears/item/spear/hit1",
+        "sounds/jl/spears/item/spear/hit2",
+        "sounds/jl/spears/item/spear/hit3"
+      ]
+    },
+    "item.jl_spears:spear.use": {
+      "category": "hostile",
+      "sounds": [
+        "sounds/jl/spears/item/spear/use"
+      ]
+    },
+    "item.jl_spears:spear.wood.attack": {
+      "category": "hostile",
+      "sounds": [
+        "sounds/jl/spears/item/spear/wood/attack1",
+        "sounds/jl/spears/item/spear/wood/attack2",
+        "sounds/jl/spears/item/spear/wood/attack3"
+      ]
+    },
+    "item.jl_spears:spear.wood.hit": {
+      "category": "hostile",
+      "sounds": [
+        "sounds/jl/spears/item/spear/wood/hit1",
+        "sounds/jl/spears/item/spear/wood/hit2",
+        "sounds/jl/spears/item/spear/wood/hit3"
+      ]
+    },
+    "item.jl_spears:spear.wood.use": {
+      "category": "hostile",
+      "sounds": [
+        "sounds/jl/spears/item/spear/wood/use"
+      ]
+    }
+  }
+}

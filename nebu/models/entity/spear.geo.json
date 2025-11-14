@@ -1,0 +1,31 @@
+{
+	"format_version": "1.16.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.jl_spears.spear",
+				"texture_width": 16,
+				"texture_height": 16
+			},
+			"bones": [
+				{
+					"name": "rightitem",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "spear",
+					"parent": "rightitem",
+					"pivot": [1.5, 0, -1],
+					"texture_meshes": [
+						{
+							"texture": "default",
+							"position": [2, 1, -1],
+							"rotation": [0, -135, 90],
+							"local_pivot": [6, 0, 6]
+						}
+					]
+				}
+			]
+		}
+	]
+}

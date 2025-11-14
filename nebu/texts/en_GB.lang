@@ -1,0 +1,12 @@
+pack.name=Spears of Mayhem Add-On v1.1	#
+pack.description=Charge into battle and unleash the fury of the legendary SPEARS from Minecraft's new game drop "Mounts of Mayhem", ready to pierce and dominate your adventures! §6By: @JeanLucasMCPE§r	#
+
+item.jl_spears:wooden_spear.name=Wooden Spear	#
+item.jl_spears:stone_spear.name=Stone Spear	#
+item.jl_spears:copper_spear.name=Copper Spear	#
+item.jl_spears:iron_spear.name=Iron Spear	#
+item.jl_spears:golden_spear.name=Golden Spear	#
+item.jl_spears:diamond_spear.name=Diamond Spear	#
+item.jl_spears:netherite_spear.name=Netherite Spear	#
+
+itemGroup.name.jl_spears:spears=Spears	#

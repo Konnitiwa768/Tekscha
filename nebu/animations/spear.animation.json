@@ -1,0 +1,106 @@
+{
+	"format_version": "1.10.0",
+	"animations": {
+		"animation.jl_spears.spear.wield_first_person": {
+			"loop": true,
+			"bones": {
+				"rightitem": {
+					"rotation": [-120, 60, -100],
+					"position": [-6, 1, -1]
+				}
+			}
+		},
+		"animation.jl_spears.spear.wield_third_person": {
+			"loop": true,
+			"bones": {
+				"rightitem": {
+					"rotation": [-90, 0, 180],
+					"position": [2.5, 0.5, -4.5],
+					"scale": 1.5
+				}
+			}
+		},
+		"animation.jl_spears.spear.jab_attack_first_person": {
+			"animation_length": 1,
+			"loop": true,
+			"anim_time_update": "v.spear_jab_attack_time",
+			"bones": {
+				"rightitem": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.1": [78, 2, 10],
+						"0.7": [78, 2, 10],
+						"1.0": [0, 0, 0]
+					},
+					"position": {
+						"0.0": [0, 0, 0],
+						"0.1": [-3, 2, 1],
+						"0.15": [-3, 2, -3],
+						"0.7": [-3, 2, -3],
+						"1.0": [0, 0, 0]
+					}
+				}
+			}
+		},
+		"animation.jl_spears.spear.charge_attack_first_person": {
+			"loop": true,
+			"animation_length": 15.75,
+			"anim_time_update": "v.spear_charge_time * 15.75",
+			"bones": {
+				"rightitem": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.1": [-7.5, 0, -5],
+						"0.3": [-70, -50, -110],
+						"15.5": [-70, -50, -110],
+						"15.75": [0, 0, 0]
+					},
+					"position": {
+						"0.0": [0, 0, 0],
+						"0.1": [0, 0, 1],
+						"0.25": [0, 0, -5],
+						"15.5": [0, 0, -5],
+						"15.75": [0, 0, 0]
+					}
+				},
+				"spear": {
+					"rotation": {
+						"5.6": [0, 0, 0],
+						"6.2": [0, -45, 0],
+						"15.5": [0, -45, 0],
+						"15.75": [0, 0, 0]
+					}
+				}
+			}
+		},
+		"animation.jl_spears.spear.charge_attack_third_person": {
+			"loop": true,
+			"animation_length": 15.75,
+			"anim_time_update": "v.spear_charge_time * 15.75",
+			"bones": {
+				"rightitem": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.25": [-70, 0, 0],
+						"15.5": [-70, 0, 0],
+						"15.75": [0, 0, 0]
+					},
+					"position": {
+						"0.0": [0, 0, 0],
+						"0.25": [0, -9, 0],
+						"15.5": [0, -9, 0],
+						"15.75": [0, 0, 0]
+					}
+				},
+				"spear": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.25": [0, 90, 0],
+						"5.6": [0, 90, 0],
+						"6.2": [0, 0, 0]
+					}
+				}
+			}
+		}
+	}
+}

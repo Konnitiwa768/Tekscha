@@ -1,0 +1,12 @@
+pack.name=Spears of Mayhem Add-On v1.1	#
+pack.description=Lance-se ao campo de batalha e libere a fúria das lendárias LANÇAS do novo game drop do Minecraft "Mounts of Mayhem", prontas para perfurar e dominar suas aventuras! §6Por: @JeanLucasMCPE§r	#
+
+item.jl_spears:wooden_spear.name=Lança de Madeira	#
+item.jl_spears:stone_spear.name=Lança de Pedra	#
+item.jl_spears:copper_spear.name=Lança de Cobre	#
+item.jl_spears:iron_spear.name=Lança de Ferro	#
+item.jl_spears:golden_spear.name=Lança de Ouro	#
+item.jl_spears:diamond_spear.name=Lança de Diamante	#
+item.jl_spears:netherite_spear.name=Lança de Netherita	#
+
+itemGroup.name.jl_spears:spears=Lanças	#

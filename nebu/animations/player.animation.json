@@ -1,0 +1,72 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.jl_spears.player.spear_hold": {
+      "loop": true,
+      "bones": {
+        "rightarm": {
+          "rotation": [ "(q.is_riding ? 25.0) + -20.0 + q.target_x_rotation - q.is_sneaking * 15.0", "-5.0 + q.target_y_rotation", 0.0 ]
+        }
+      }
+    },
+    "animation.jl_spears.player.spear_jab_attack": {
+      "loop": true,
+      "anim_time_update": "v.spear_jab_attack_time",
+      "bones": {
+        "body": {
+          "rotation": [ 0.0, "Math.sin(360*Math.sqrt(v.spear_jab_attack_time)) * 5.0", 0.0 ]
+        },
+        "rightArm": {
+					"rotation": {
+            "0.0": [180, 0, 0],
+            "0.2": [-15, 0, 0],
+            "0.4": [-35, 0, 0],
+            "0.8": [-35, 0, 0],
+            "1.0": [0, 0, 0]
+          }
+				},
+        "rightItem": {
+					"rotation": {
+            "0.0": [-35, 0, 0],
+            "0.2": [50, 0, 0],
+            "0.4": [70, 0, 0],
+            "0.8": [70, 0, 0],
+            "1.0": [0, 0, 0]
+          },
+					"position": {
+            "0.0": [0, 0, 0],
+            "0.2": [0, -2, -2],
+            "0.4": [0, -4, -3.5],
+            "0.8": [0, -4, -3.5],
+            "1.0": [0, 0, 0]
+          }
+				}
+      }
+    },
+    "animation.jl_spears.player.spear_charge_attack": {
+      "loop": true,
+			"animation_length": 15.75,
+      "anim_time_update": "v.spear_charge_time * 15.75",
+			"bones": {
+				"rightArm": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.25": [-35, 0, 0],
+						"0.5": ["v.is_first_person ? -35 : 0", 0, 0],
+						"0.75": [-35, 0, 0],
+						"5.6": [-35, 0, 0],
+						"5.8": [-35, "math.sin(q.anim_time * 500) * -3", "math.sin(q.anim_time * 400) * -3"],
+						"6.0": [-36, "math.sin(q.anim_time * 500) * -3", "math.sin(q.anim_time * 400) * -3"],
+						"6.4": [-40.5, "math.sin(q.anim_time * 500) * -3", "math.sin(q.anim_time * 400) * -3"],
+						"6.7": [-35, "math.sin(q.anim_time * 500) * -3", "math.sin(q.anim_time * 400) * -3"],
+						"9.8": [-36, "math.sin(q.anim_time * 500) * -3", "math.sin(q.anim_time * 400) * -3"],
+						"10.0": [-45, "math.sin(q.anim_time * 500) * -3", "math.sin(q.anim_time * 400) * -3"],
+						"11.4": [-17.5, "math.sin(q.anim_time * 500) * -3", "math.sin(q.anim_time * 400) * -3"],
+						"15.5": [-10.5, "math.sin(q.anim_time * 500) * -3", "math.sin(q.anim_time * 400) * -3"],
+						"15.75": [0, 0, 0]
+					}
+				}
+			}
+		}
+  }
+}

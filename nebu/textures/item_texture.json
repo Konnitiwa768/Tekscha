@@ -1,0 +1,27 @@
+{
+  "resource_pack_name": "jl_spears",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "jl_spears:wooden_spear": {
+      "textures": "textures/jl/som/items/wooden_spear"
+    },
+    "jl_spears:stone_spear": {
+      "textures": "textures/jl/som/items/stone_spear"
+    },
+    "jl_spears:copper_spear": {
+      "textures": "textures/jl/som/items/copper_spear"
+    },
+    "jl_spears:iron_spear": {
+      "textures": "textures/jl/som/items/iron_spear"
+    },
+    "jl_spears:golden_spear": {
+      "textures": "textures/jl/som/items/golden_spear"
+    },
+    "jl_spears:diamond_spear": {
+      "textures": "textures/jl/som/items/diamond_spear"
+    },
+    "jl_spears:netherite_spear": {
+      "textures": "textures/jl/som/items/netherite_spear"
+    }
+  }
+}
