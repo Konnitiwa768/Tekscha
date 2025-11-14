@@ -29,7 +29,18 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git reset --hard
+          git clean -fd
+
+          # 最新のリモートを取得
+          git fetch origin
+          git reset --hard origin/main
+
+          # MCPackを追加
           git add nebu/
-          git pull --rebase
-          git commit -m "Auto-build: Bedwars Mega MCPack updated" || echo "No changes to commit"
-          git push
+
+          # 変更があればコミット
+          git diff --cached --quiet || git commit -m "Auto-build: Bedwars Mega MCPack updated"
+
+          # push
+          git push origin main
