@@ -23,7 +23,7 @@ jobs:
           mkdir -p nebu
 
           
-          unzip SpearsOfMayhem_RP.zip" -d nebu/
+          unzip SpearsOfMayhem_RP.zip -d nebu/
 
       - name: Commit MCPack file
         run: |
