@@ -23,11 +23,8 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          if [ -d nebu ]; then
-            git add nebu/
-            git commit -m "Auto-build: Bedwars Mega MCPack updated" || echo "No changes to commit"
-            git push
-          else
-            echo "No .mcpack file generated."
-          fi
+          git add nebu/
+          git pull
+          git commit -m "Auto-build: Bedwars Mega MCPack updated" || echo "No changes to commit"
+          git push
+          
