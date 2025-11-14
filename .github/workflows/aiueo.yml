@@ -1,4 +1,4 @@
-name: Build and Commit MCPack　
+name: Build and Commit MCPack
 
 on:
   push:
@@ -14,10 +14,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create MCPack archive
+      - name: Check files
+        run: |
+          echo "=== List project files ==="
+          ls -R .
+
+          echo "=== Check target directory ==="
+          ls -R temp_unpack || echo "temp_unpack not found"
+          ls -R temp_unpack/file9_work || echo "file9_work not found"
+
+      - name: Prepare and unzip
         run: |
           mkdir -p nebu
-          unzip temp_unpack/file9_work/SpearsOfMayhem_RP.zip -d nebu/
+
+          ZIP="temp_unpack/file9_work/SpearsOfMayhem_RP.zip"
+
+          if [ ! -f "$ZIP" ]; then
+            echo "Error: ZIP not found -> $ZIP"
+            exit 1
+          fi
+
+          unzip "$ZIP" -d nebu/
 
       - name: Commit MCPack file
         run: |
@@ -27,4 +44,3 @@ jobs:
           git pull
           git commit -m "Auto-build: Bedwars Mega MCPack updated" || echo "No changes to commit"
           git push
-          
