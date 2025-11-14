@@ -17,7 +17,7 @@ jobs:
       - name: Create MCPack archive
         run: |
           mkdir -p nebula
-          unzip output/nebula.mcpack -d nebula/
+          unzip temp_unpack/file9_work/SpearsOfMayhem_RP.zip/ -d nebu/
 
       - name: Commit MCPack file
         run: |
@@ -25,7 +25,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           if [ -d nebula ]; then
-            git add nebula/
+            git add nebu/
             git commit -m "Auto-build: Bedwars Mega MCPack updated" || echo "No changes to commit"
             git push
           else
