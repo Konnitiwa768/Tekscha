@@ -1,4 +1,4 @@
-name: Build and Commit MCPack　
+name: Build and Commit MCPack
 
 on:
   push:
@@ -11,36 +11,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Check files
-        run: |
-          
-
-      - name: Prepare and unzip
-        run: |
+      - run: |
+          rm -rf nebu
           mkdir -p nebu
-
-          
           unzip SpearsOfMayhem_RP.zip -d nebu/
 
-      - name: Commit MCPack file
-        run: |
+      - run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git reset --hard
-          git clean -fd
-
-          # 最新のリモートを取得
-          git fetch origin
-          git reset --hard origin/main
-
-          # MCPackを追加
+          
           git add nebu/
-
-          # 変更があればコミット
-          git diff --cached --quiet || git commit -m "Auto-build: Bedwars Mega MCPack updated"
-
-          # push
+          git pull
+          git commit -m "Auto-build: Bedwars Mega MCPack updated"
           git push origin main
