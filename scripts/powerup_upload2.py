@@ -20,6 +20,8 @@ os.makedirs(TEMP_DIR, exist_ok=True)
 
 FILES = [
     {"project_id": 1174972, "file_id": 7173049, "name": "file1.zip"},
+    {"project_id": 829202, "file_id": 7212197, "name": "BP.zip"},
+    {"project_id": 829202, "file_id": 7212199, "name": "RP.zip"},
     {"project_id": 1152638, "file_id": 6994787, "name": "file2.zip"},
     {"project_id": 1083023, "file_id": 6365190, "name": "file3.zip"},
     {"project_id": 993926, "file_id": 7159195, "name": "file4.zip"},
@@ -194,7 +196,7 @@ def main():
                         upload_one(page, ef)
                         time.sleep(4)
             else:
-                page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=behavior_packs%2Fdura")
+                page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=behavior_packs%2FModern")
                 page.wait_for_load_state("networkidle")
                 upload_one(page, path)
                 time.sleep(4)
