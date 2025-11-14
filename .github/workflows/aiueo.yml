@@ -16,25 +16,14 @@ jobs:
 
       - name: Check files
         run: |
-          echo "=== List project files ==="
-          ls -R .
-
-          echo "=== Check target directory ==="
-          ls -R temp_unpack || echo "temp_unpack not found"
-          ls -R temp_unpack/file9_work || echo "file9_work not found"
+          
 
       - name: Prepare and unzip
         run: |
           mkdir -p nebu
 
-          ZIP="temp_unpack/file9_work/SpearsOfMayhem_RP.zip"
-
-          if [ ! -f "$ZIP" ]; then
-            echo "Error: ZIP not found -> $ZIP"
-            exit 1
-          fi
-
-          unzip "$ZIP" -d nebu/
+          
+          unzip SpearsOfMayhem_RP.zip" -d nebu/
 
       - name: Commit MCPack file
         run: |
