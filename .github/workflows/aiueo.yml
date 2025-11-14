@@ -1,4 +1,4 @@
-name: Build and Commit MCPack
+name: Build and Commit MCPack　
 
 on:
   push:
