@@ -18,13 +18,20 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y imagemagick
 
       - name: Create destination directory
-        run: mkdir -p Pack/textures/block
+        run: mkdir -p Pack/Textures/block
 
       - name: Move and darken textures
         run: |
           SRC_DIR="resource_packs/textures/blocks"
-          DEST_DIR="Pack/textures/block"
+          DEST_DIR="Pack/Textures/block"
 
+          # ディレクトリ存在確認
+          if [ ! -d "$SRC_DIR" ]; then
+            echo "Source directory does not exist: $SRC_DIR"
+            exit 1
+          fi
+
+          shopt -s nullglob
           for file in "$SRC_DIR"/*.png; do
             filename=$(basename "$file")
 
@@ -49,7 +56,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Pack/textures/block
+          git add Pack/Textures/block
           git pull
           git commit -m "Move and darken block textures"
           git push
