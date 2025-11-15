@@ -25,6 +25,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Move item textures from Pack/textures/item to items" || echo "No changes to commit"
           git pull
+          git commit -m "Move item textures from Pack/textures/item to items" || echo "No changes to commit"
+  
           git push
