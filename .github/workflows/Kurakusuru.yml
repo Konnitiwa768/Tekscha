@@ -22,7 +22,7 @@ jobs:
 
       - name: Move and darken textures
         run: |
-          SRC_DIR="resource_packs/textures/blocks"
+          SRC_DIR="resource_pack/textures/blocks"
           DEST_DIR="Pack/textures/block"
 
           # ディレクトリ存在確認
