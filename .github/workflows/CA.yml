@@ -17,9 +17,9 @@ jobs:
 
       - name: Move Pack/textures/item to items
         run: |
-          mkdir -p Pack/textures/items
-          if [ -d "items" ]; then
-            mv items/* Pack/textures/items || true
+          mkdir -p Pack/textures/block
+          if [ -d "blocks" ]; then
+            mv Pack/textures/block/* Pack/textures/blocks || true
             rm -rf items
           fi
 
