@@ -27,51 +27,62 @@ jobs:
           for file in Pack/**/*.{png,jpg,jpeg,tga,bmp}; do
             [ -f "$file" ] || continue
 
+            # environment は一切触らない
+            if [[ "$file" == *"Textures/environment/"* ]]; then
+              continue
+            fi
+
             out="Pack2/${file#Pack/}"
             mkdir -p "$(dirname "$out")"
 
             fname=$(basename "$file" | tr '[:upper:]' '[:lower:]')
 
-            # デフォルトはモノクロ
-            convert_cmd='convert "$file" -colorspace Gray'
+            # デフォルトはモノクロ（上乗せしない）
+            convert_cmd='convert "$file" -colorspace Gray "$out"'
 
-            # 分岐処理
+            # レイヤーを上乗せする関数（紫などを上乗せ）
+            overlay() {
+              local r=$1; local g=$2; local b=$3; local percent=$4
+              echo "convert \"$file\" \\( -size 1x1 xc:rgb($r,$g,$b) -resize 100% \\) \
+                -compose screen -define compose:args=${percent} -composite \"$out\""
+            }
+
             if [[ "$fname" == *"bow"* || "$fname" == *"crossbow"* ]]; then
-              # 彩度50%
-              convert_cmd='convert "$file" -modulate 100,50,100'
+              # 彩度50%（上乗せではなく modulate の方が自然）
+              convert_cmd='convert "$file" -modulate 100,50,100 "$out"'
 
             elif [[ "$fname" == *"diamond"* ]]; then
-              # 淡い水色
-              convert_cmd='convert "$file" -colorspace Gray -colorize 20,40,80'
+              # 水色を35%上乗せ
+              convert_cmd=$(overlay 80 150 255 35)
 
             elif [[ "$fname" == *"gold"* ]]; then
-              # オレンジ黄色
-              convert_cmd='convert "$file" -colorspace Gray -colorize 80,60,0'
+              # 黄〜オレンジを40%上乗せ
+              convert_cmd=$(overlay 255 200 60 40)
 
             elif [[ "$fname" == *"iron"* ]]; then
-              # グレー強調：モノクロのまま
-              convert_cmd='convert "$file" -colorspace Gray'
+              # グレー → モノクロのままでOK
+              convert_cmd='convert "$file" -colorspace Gray "$out"'
 
             elif [[ "$fname" == *"copper"* ]]; then
-              # 赤寄り
-              convert_cmd='convert "$file" -colorspace Gray -colorize 80,20,20'
+              # 赤を40%上乗せ
+              convert_cmd=$(overlay 220 80 60 40)
 
             elif [[ "$fname" == *"netherite"* ]]; then
-              # 紫寄り
-              convert_cmd='convert "$file" -colorspace Gray -colorize 60,20,80'
+              # 紫を40%上乗せ
+              convert_cmd=$(overlay 150 60 180 40)
 
             elif [[ "$fname" == *"fire"* ]]; then
-              # 元の色に紫75%を上乗せ
-              convert_cmd='convert "$file" -colorize 0,0,75'
+              # 紫75%上乗せ（あなたの指定）
+              convert_cmd=$(overlay 150 60 220 75)
             fi
 
-            # 実行
-            eval $convert_cmd '"$out"'
+            eval $convert_cmd
           done
 
       - name: Copy non-image files
         run: |
-          rsync -av --exclude='*.png' --exclude='*.jpg' --exclude='*.jpeg' \
+          rsync -av --exclude='Textures/environment' \
+            --exclude='*.png' --exclude='*.jpg' --exclude='*.jpeg' \
             --exclude='*.tga' --exclude='*.bmp' Pack/ Pack2/
 
       - name: Commit and push changes
@@ -82,5 +93,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Pack2/
           git pull
-          git commit -m "Generate colored grayscale Pack -> Pack2" || echo "No changes to commit"
+          git commit -m "Generate color-overlay grayscale Pack -> Pack2" || echo "No changes to commit"
           git push
