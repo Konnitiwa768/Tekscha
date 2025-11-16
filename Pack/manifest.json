@@ -1,15 +1,15 @@
 {
   "format_version": 2,
   "header": {
-    "description": "Bedwars Mega Resource Pack - team wool, deepslate, and item textures",
-    "name": "Bedwars Mega Pack",
+    "description": "PVP Texture Purpleshock by komugishomin",
+    "name": "Purpleshock",
     "uuid": "b52cb3da-45ae-4e4d-b1b2-9b6b1829dfc0",
     "version": [1, 0, 0],
     "min_engine_version": [1, 20, 0]
   },
   "modules": [
     {
-      "description": "Bedwars Mega Textures Module",
+      "description": "Purpleshock Textures Module",
       "type": "resources",
       "uuid": "49f05c68-0908-440f-a50d-c16bdb648b9e",
       "version": [1, 0, 0]
