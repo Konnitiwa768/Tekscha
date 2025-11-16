@@ -1,0 +1,86 @@
+name: Convert Pack to Gray (BE Resource Pack)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  gray_pack:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y imagemagick
+
+      - name: Prepare output directory
+        run: |
+          rm -rf Pack2
+          mkdir -p Pack2
+
+      - name: Convert images with rules
+        run: |
+          shopt -s globstar nullglob
+          for file in Pack/**/*.{png,jpg,jpeg,tga,bmp}; do
+            [ -f "$file" ] || continue
+
+            out="Pack2/${file#Pack/}"
+            mkdir -p "$(dirname "$out")"
+
+            fname=$(basename "$file" | tr '[:upper:]' '[:lower:]')
+
+            # デフォルトはモノクロ
+            convert_cmd='convert "$file" -colorspace Gray'
+
+            # 分岐処理
+            if [[ "$fname" == *"bow"* || "$fname" == *"crossbow"* ]]; then
+              # 彩度50%
+              convert_cmd='convert "$file" -modulate 100,50,100'
+
+            elif [[ "$fname" == *"diamond"* ]]; then
+              # 淡い水色
+              convert_cmd='convert "$file" -colorspace Gray -colorize 20,40,80'
+
+            elif [[ "$fname" == *"gold"* ]]; then
+              # オレンジ黄色
+              convert_cmd='convert "$file" -colorspace Gray -colorize 80,60,0'
+
+            elif [[ "$fname" == *"iron"* ]]; then
+              # グレー強調：モノクロのまま
+              convert_cmd='convert "$file" -colorspace Gray'
+
+            elif [[ "$fname" == *"copper"* ]]; then
+              # 赤寄り
+              convert_cmd='convert "$file" -colorspace Gray -colorize 80,20,20'
+
+            elif [[ "$fname" == *"netherite"* ]]; then
+              # 紫寄り
+              convert_cmd='convert "$file" -colorspace Gray -colorize 60,20,80'
+
+            elif [[ "$fname" == *"fire"* ]]; then
+              # 元の色に紫75%を上乗せ
+              convert_cmd='convert "$file" -colorize 0,0,75'
+            fi
+
+            # 実行
+            eval $convert_cmd '"$out"'
+          done
+
+      - name: Copy non-image files
+        run: |
+          rsync -av --exclude='*.png' --exclude='*.jpg' --exclude='*.jpeg' \
+            --exclude='*.tga' --exclude='*.bmp' Pack/ Pack2/
+
+      - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Pack2/
+          git pull
+          git commit -m "Generate colored grayscale Pack -> Pack2" || echo "No changes to commit"
+          git push
