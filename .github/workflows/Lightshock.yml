@@ -1,0 +1,34 @@
+name: Build and Commit MCPack
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create MCPack archive
+        run: |
+          zip -r Lightshock.mcpack Pack3/
+
+      - name: Commit MCPack file
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [ -f Bedwars_Mega.mcpack ]; then
+            mkdir -p releases
+            mv Lightshock.mcpack releases/
+            git add releases/Lightshock.mcpack
+            git commit -m "Auto-build: Bedwars Mega MCPack updated"
+            git push
+          else
+            echo "No .mcpack file generated."
+          fi
