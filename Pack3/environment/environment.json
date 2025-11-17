@@ -1,0 +1,30 @@
+{
+  "format_version": "1.21.10",
+  "minecraft:environment": {
+    "description": {
+      "identifier": "custom:fixed_sky"
+    },
+    "components": {
+      "minecraft:sky": {
+        "type": "cube_map",
+        "cube_map": {
+          "north": "textures/environment/sky_front",
+          "south": "textures/environment/sky_back",
+          "east": "textures/environment/sky_right",
+          "west": "textures/environment/sky_left",
+          "up": "textures/environment/sky_top",
+          "down": "textures/environment/sky_bottom"
+        },
+        "sun_enabled": false,
+        "moon_enabled": false,
+        "stars_enabled": false,
+        "clouds_enabled": false
+      },
+      "minecraft:fog": {
+        "fog_color": [1.0, 1.0, 1.0],
+        "fog_start": 99999,
+        "fog_end": 100000
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "resource_pack_name": "bedwars_mega_pack",
+  "texture_name": "atlas.terrain",
+  "padding": 8,
+  "num_mip_levels": 4,
+  "texture_data": {
+    "red_wool": { "textures": "textures/blocks/red_wool" },
+    "iron_ore": { "textures": "textures/blocks/iron_ore" },
+    "lapis_ore": { "textures": "textures/blocks/lapis_ore" },
+    "gold_ore": { "textures": "textures/blocks/gold_ore" },
+    "emerald_ore": { "textures": "textures/blocks/emerald_ore" },
+    "diamond_ore": { "textures": "textures/blocks/diamond_ore" },
+    "blue_wool": { "textures": "textures/blocks/blue_wool" },
+    "oak_planks": { "textures": "textures/blocks/oak_planks" },
+    "obsidian": { "textures": "textures/blocks/obsidian" },
+    "deepslate": { "textures": "textures/blocks/deepslate" },
+    "stone": { "textures": "textures/blocks/stone" }
+  }
+}
