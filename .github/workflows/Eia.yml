@@ -24,12 +24,12 @@ jobs:
           rm -rf Pack3
           mkdir -p Pack3
 
-      - name: Convert images with overlay layers
+      - name: Convert images with overlay or gamma
         run: |
           shopt -s globstar nullglob
           for file in Pack/**/*.{png,jpg,jpeg,tga,bmp}; do
             case "$file" in
-              *Textures/environment*) continue ;; # 除外
+              *Textures/environment*) continue ;;
             esac
 
             [ -f "$file" ] || continue
@@ -38,10 +38,14 @@ jobs:
 
             filename=$(basename "$file" | tr '[:upper:]' '[:lower:]')
 
-            # 画像サイズ取得
-            read w h <<< $(identify -format "%w %h" "$file")
+            # blocks は gamma 補正だけ
+            if [[ "$file" == *textures/blocks* ]]; then
+              convert "$file" -gamma 1.6 "$out"
+              continue
+            fi
 
-            # 色レイヤーの定義
+
+            # ===== overlay カラーを定義 =====
             if [[ "$filename" == *bow* || "$filename" == *crossbow* ]]; then
               overlay="#888888"
             elif [[ "$filename" == *diamond* ]]; then
@@ -60,17 +64,15 @@ jobs:
               overlay="#000000"
             fi
 
-            # textures/blocks は 100%明るくする
-            if [[ "$file" == *textures/blocks* ]]; then
-              brightness_overlay="#FFFFFF"
-              convert "$file" \
-                \( -size ${w}x${h} xc:"$brightness_overlay" -compose Overlay -composite \) \
-                "$out"
-            else
-              convert "$file" \
-                \( -size ${w}x${h} xc:"$overlay" -compose Overlay -composite \) \
-                "$out"
-            fi
+            # 画像サイズ取得
+            w=$(identify -format "%w" "$file")
+            h=$(identify -format "%h" "$file")
+
+            # ===== IM6 互換 Overlay 合成 =====
+            convert "$file" \
+              \( -size ${w}x${h} xc:"$overlay" \) \
+              -compose Overlay -composite \
+              "$out"
 
           done
 
@@ -87,5 +89,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Pack3/
           git pull
-          git commit -m "Generate overlay-colored Pack -> Pack3" || echo "No changes to commit"
+          git commit -m "Generate overlay-colored Pack -> Pack3 with gamma for blocks" || echo "No changes to commit"
           git push
