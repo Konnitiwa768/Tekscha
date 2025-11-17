@@ -3,8 +3,8 @@ import math
 import numpy as np
 from PIL import Image
 
-INPUT_PATH = "SP3.png"
-OUTPUT_DIR = "Pack2/textures/environment/overworld_cubemap"
+INPUT_PATH = "SP_4.png"
+OUTPUT_DIR = "Pack3/textures/environment/overworld_cubemap"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # 出力順序（Bedrock対応）
