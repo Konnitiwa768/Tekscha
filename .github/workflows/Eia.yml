@@ -44,7 +44,6 @@ jobs:
               continue
             fi
 
-
             # ===== overlay カラーを定義 =====
             if [[ "$filename" == *bow* || "$filename" == *crossbow* ]]; then
               overlay="#888888"
@@ -68,10 +67,11 @@ jobs:
             w=$(identify -format "%w" "$file")
             h=$(identify -format "%h" "$file")
 
-            # ===== IM6 互換 Overlay 合成 =====
+            # ===== IM6 透明保護 Overlay 合成 =====
             convert "$file" \
               \( -size ${w}x${h} xc:"$overlay" \) \
               -compose Overlay -composite \
+              \( "$file" -alpha extract \) -compose CopyOpacity -composite \
               "$out"
 
           done
