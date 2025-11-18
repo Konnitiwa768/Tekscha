@@ -27,6 +27,7 @@ jobs:
             mkdir -p releases
             mv Lightshock.mcpack releases/
             git add releases/Lightshock.mcpack
+            git pull
             git commit -m "Auto-build: Bedwars Mega MCPack updated"
             git push
           else
