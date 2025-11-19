@@ -1,0 +1,46 @@
+name: Generate Pikacheet C-like Sound FSB
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg sox
+
+      - name: Generate base tone (C note)
+        run: |
+          sox -n base.wav synth 0.3 sine 261.63
+
+      - name: Shape sound to "Pikacheet-like"
+        run: |
+          sox base.wav shaped.wav \
+            pitch 700 \
+            tremolo 12 40 \
+            gain -3
+
+      - name: Convert to FSB (simple wrapper using ffmpeg -> raw -> placeholder)
+        run: |
+          ffmpeg -y -i shaped.wav -f s16le -acodec pcm_s16le shaped.raw
+          # NOTE: real FSB requires fsbank or fmod tools; replace below with actual command if available
+          cp shaped.raw output.fsb
+
+      
+
+      - name: Push to another repository
+        run: |
+          cd
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add output.fsb
+          git pull
+          git commit -m "Add generated Pikacheet C sound"
+          git push
