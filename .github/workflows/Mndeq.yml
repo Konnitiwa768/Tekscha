@@ -13,9 +13,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          persist-credentials: true
-          fetch-depth: 0
 
       - name: Install dependencies
         run: |
@@ -37,28 +34,25 @@ jobs:
           mkdir -p "$RP_DIR/font"
 
           # Deno スクリプトの d8 文字列を継承
-          D8='ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ§© !"#$%&'\''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~⌂ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø×ƒáíóúñÑªº¿®¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αβΓπΣσμτΦΘΩδ∞∅∈∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■ '
+          D8='ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ§© !"#$%&'\''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~⌂ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø×ƒáíóúñÑªº¿®¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αβΓπΣσμτΦΘΩδ∞∅∈∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■'
 
-          # 生成リスト
-          LIST=$(seq -1 255)
-          
-          for i in $LIST; do
-            if [ "$i" -lt 0xd8 ] || [ "$i" -gt 0xf5 ]; then
-              if [ "$i" -lt 0 ]; then
-                CHAR=$(echo -n "$D8" | cut -c$((i + 2))) # cut は 1 始まり、-1 を補正
-              else
-                CHAR=$(printf "\\$(printf '%03o' "$i")") # ASCII 文字を安全に
-              fi
+          # -1 (D8 文字) と 0-255 (ASCII) を順に処理
+          for i in $(seq -1 255); do
+            if [ "$i" -lt 0 ]; then
+              # D8 配列の文字
+              INDEX=$((i + 1 + ${#D8})) # 文字列の最後に正しくマップ
+              CHAR=$(echo -n "$D8" | cut -c$((i + 2)))
+            else
+              CHAR=$(printf "\\$(printf '%03o' "$i")") # ASCII を octal で渡す
+            fi
 
-              FILENAME="$RP_DIR/font/glyph_$(printf '%02x' $i).png"
-
-              # 空文字の場合はスキップ
-              if [ -n "$CHAR" ]; then
-                convert -size "${IMG_SIZE}x${IMG_SIZE}" -background none \
-                  -fill white -font "$FONT_FILE" -pointsize "$IMG_SIZE" \
-                  -gravity northwest caption:"$CHAR" \
-                  "$FILENAME" || echo "Skipped invalid char: $CHAR"
-              fi
+            # 文字が空でなければ生成
+            if [ -n "$CHAR" ]; then
+              HEX=$(printf "%02x" $((i < 0 ? i + 256 : i))) # -1 は ff に
+              convert -size "${IMG_SIZE}x${IMG_SIZE}" -background none \
+                -fill white -font "$FONT_FILE" -pointsize "$IMG_SIZE" \
+                -gravity northwest caption:"$CHAR" \
+                "$RP_DIR/font/glyph_$HEX.png" || echo "Skipped invalid char: $CHAR"
             fi
           done
 
@@ -67,5 +61,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Pack
+          git pull
           git diff-index --quiet HEAD || git commit -m "Auto-update glyph PNGs"
           git push
