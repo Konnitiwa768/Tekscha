@@ -1,0 +1,34 @@
+name: Build Glyph Pack with Deno
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Run glyph generation
+        run: deno run --allow-net --allow-write --allow-read generate_glyphs.ts
+
+      - name: Commit generated RP
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add RP
+          git diff-index --quiet HEAD || git commit -m "Auto-update glyph pack"
+          git push
