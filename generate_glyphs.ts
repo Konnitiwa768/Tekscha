@@ -4,7 +4,7 @@ import { createCanvas, registerFont, CanvasRenderingContext2D } from "https://de
 import { ensureDir } from "https://deno.land/std/fs/mod.ts";
 
 // RP ディレクトリ
-const RP_DIR = "RP";
+const RP_DIR = "Pack";
 const FONT_DIR = `${RP_DIR}/font`;
 await ensureDir(FONT_DIR);
 
