@@ -47,20 +47,10 @@ for (const i of LIST) {
 }
 
 // manifest.json
-await Deno.writeTextFile(`${RP_DIR}/manifest.json`, JSON.stringify({
-  name: "font resource pack",
-  description: "Generated glyphs",
-  version: [1, 0, 0]
-}, null, 2));
+
 
 // pack_icon.png
-const iconCanvas = createCanvas(IMG_SIZE, IMG_SIZE);
-const iconCtx = iconCanvas.getContext("2d");
-iconCtx.fillStyle = "#ffffff";
-iconCtx.font = `${IMG_SIZE/2}px "Kosugi Maru", sans-serif`;
-iconCtx.textAlign = "center";
-iconCtx.textBaseline = "middle";
-iconCtx.fillText("Aa", IMG_SIZE/2, IMG_SIZE/2);
-await Deno.writeFile(`${RP_DIR}/pack_icon.png`, iconCanvas.toBuffer("image/png"));
+// iconCtx.fillText("Aa", IMG_SIZE/2, IMG_SIZE/2);
+// await Deno.writeFile(`${RP_DIR}/pack_icon.png`, iconCanvas.toBuffer("image/png"));
 
 console.log("RP/ glyph pack generated");
