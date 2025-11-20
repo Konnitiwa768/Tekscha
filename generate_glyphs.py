@@ -20,7 +20,7 @@ D8 = ("ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ§© "
       "αβΓπΣσμτΦΘΩδ∞∅∈∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■ ")
 
 # Google Fonts Kosugi Maru を直接取得
-font_url = "https://github.com/google/fonts/raw/main/ofl/kosugimaru/KosugiMaru-Regular.ttf"
+font_url = "https://github.com/satsuyako/YomogiFont/raw/refs/heads/ver3.00/fonts/ttf/Yomogi-Regular.ttf"
 font_path = os.path.join(FONT_DIR, "KosugiMaru-Regular.ttf")
 
 if not os.path.exists(font_path):
