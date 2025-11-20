@@ -30,22 +30,36 @@ jobs:
       - name: Generate glyph PNGs
         run: |
           set -e
+          export LANG=C.UTF-8
           IMG_SIZE=64
           RP_DIR=Pack
           FONT_FILE="$RP_DIR/font/KosugiMaru-Regular.ttf"
-          mkdir -p "$RP_DIR/font/glyphs"
+          mkdir -p "$RP_DIR/font"
 
-          # 使用したい文字列を一括定義
-          CHARS=' !"#$%&'\''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ§©⌂ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø×ƒáíóúñÑªº¿®¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αβΓπΣσμτΦΘΩδ∞∅∈∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■'
+          # Deno スクリプトの d8 文字列を継承
+          D8='ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ§© !"#$%&'\''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~⌂ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø×ƒáíóúñÑªº¿®¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αβΓπΣσμτΦΘΩδ∞∅∈∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■ '
 
-          INDEX=0
-          for CHAR in $(echo -n "$CHARS" | fold -w1); do
-            HEX=$(printf "%02x" $INDEX)
-            convert -size "${IMG_SIZE}x${IMG_SIZE}" -background none \
-              -fill white -font "$FONT_FILE" -pointsize "$IMG_SIZE" \
-              -gravity northwest caption:"$CHAR" \
-              "$RP_DIR/font/glyph_$HEX.png"
-            INDEX=$((INDEX + 1))
+          # 生成リスト
+          LIST=$(seq -1 255)
+          
+          for i in $LIST; do
+            if [ "$i" -lt 0xd8 ] || [ "$i" -gt 0xf5 ]; then
+              if [ "$i" -lt 0 ]; then
+                CHAR=$(echo -n "$D8" | cut -c$((i + 2))) # cut は 1 始まり、-1 を補正
+              else
+                CHAR=$(printf "\\$(printf '%03o' "$i")") # ASCII 文字を安全に
+              fi
+
+              FILENAME="$RP_DIR/font/glyph_$(printf '%02x' $i).png"
+
+              # 空文字の場合はスキップ
+              if [ -n "$CHAR" ]; then
+                convert -size "${IMG_SIZE}x${IMG_SIZE}" -background none \
+                  -fill white -font "$FONT_FILE" -pointsize "$IMG_SIZE" \
+                  -gravity northwest caption:"$CHAR" \
+                  "$FILENAME" || echo "Skipped invalid char: $CHAR"
+              fi
+            fi
           done
 
       - name: Commit generated Pack
