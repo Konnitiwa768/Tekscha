@@ -5,7 +5,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 # Pack ディレクトリ
 RP_DIR = "Pack"
-FONT_DIR = os.path.join(RP_DIR, "font")
+FONT_DIR = os.path.join(RP_DIR, "texts/ja_JP/font")
 os.makedirs(FONT_DIR, exist_ok=True)
 
 IMG_SIZE = 64
