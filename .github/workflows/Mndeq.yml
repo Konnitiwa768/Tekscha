@@ -29,6 +29,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add RP
+          git add Pack
           git diff-index --quiet HEAD || git commit -m "Auto-update glyph pack"
           git push
