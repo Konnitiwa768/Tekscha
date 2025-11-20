@@ -1,4 +1,4 @@
-name: Build Glyph Pack with Deno
+name: Build Glyph Pack (sh + curl + ImageMagick)
 
 on:
   workflow_dispatch:
@@ -11,24 +11,49 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # リポジトリをチェックアウト
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           persist-credentials: true
           fetch-depth: 0
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: v1.x
+      # 必要ツールをインストール
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y imagemagick curl
 
-      - name: Run glyph generation
-        run: deno run --allow-net --allow-write --allow-read generate_glyphs.ts
+      # Pack ディレクトリ作成 & フォント取得
+      - name: Setup Pack and font
+        run: |
+          mkdir -p Pack/font
+          curl -L -o Pack/font/KosugiMaru-Regular.ttf https://github.com/google/fonts/raw/main/ofl/kosugimaru/KosugiMaru-Regular.ttf
 
-      - name: Commit generated RP
+      # glyph PNG を生成
+      - name: Generate glyph PNGs
+        run: |
+          IMG_SIZE=64
+          RP_DIR=Pack
+          FONT_FILE="$RP_DIR/font/KosugiMaru-Regular.ttf"
+          # ASCII + d8
+          D8="ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ§© !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\`abcdefghijklmnopqrstuvwxyz{|}~⌂ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø×ƒáíóúñÑªº¿®¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αβΓπΣσμτΦΘΩδ∞∅∈∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■"
+          FONT_DIR="$RP_DIR/font"
+          mkdir -p "$FONT_DIR"
+          for i in $(seq 0 255); do
+            if [ "$i" -lt 216 ] || [ "$i" -gt 245 ]; then
+              CHAR=$(printf "\\x$(printf %x $i)")
+              convert -size "${IMG_SIZE}x${IMG_SIZE}" -background none \
+                -fill white -font "$FONT_FILE" -pointsize "$IMG_SIZE" \
+                -gravity northwest label:"$CHAR" "$FONT_DIR/glyph_$(printf "%02x" $i).png"
+            fi
+          done
+
+      # 生成結果をコミット
+      - name: Commit generated Pack
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Pack
-          git diff-index --quiet HEAD || git commit -m "Auto-update glyph pack"
+          git diff-index --quiet HEAD || git commit -m "Auto-update glyph PNGs"
           git push
