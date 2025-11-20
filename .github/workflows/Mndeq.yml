@@ -33,19 +33,29 @@ jobs:
       # glyph PNG を生成
       - name: Generate glyph PNGs
         run: |
+          set -e
           IMG_SIZE=64
           RP_DIR=Pack
           FONT_FILE="$RP_DIR/font/KosugiMaru-Regular.ttf"
-          # ASCII + d8
+          mkdir -p "$RP_DIR/font"
+
+          # ASCII + d8 (Unicode 特殊文字を含む)
           D8="ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ§© !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\`abcdefghijklmnopqrstuvwxyz{|}~⌂ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø×ƒáíóúñÑªº¿®¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αβΓπΣσμτΦΘΩδ∞∅∈∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■"
-          FONT_DIR="$RP_DIR/font"
-          mkdir -p "$FONT_DIR"
+
           for i in $(seq 0 255); do
             if [ "$i" -lt 216 ] || [ "$i" -gt 245 ]; then
-              CHAR=$(printf "\\x$(printf %x $i)")
+              # ASCII または d8 の文字を選択
+              if [ "$i" -lt 0 ]; then
+                CHAR=$(echo "$D8" | cut -c$((i+1)))
+              else
+                # Unicode エスケープで安全に渡す
+                CHAR=$(printf "\\u%04x" $i)
+              fi
+
               convert -size "${IMG_SIZE}x${IMG_SIZE}" -background none \
                 -fill white -font "$FONT_FILE" -pointsize "$IMG_SIZE" \
-                -gravity northwest label:"$CHAR" "$FONT_DIR/glyph_$(printf "%02x" $i).png"
+                -gravity northwest caption:"$CHAR" \
+                "$RP_DIR/font/glyph_$(printf "%02x" $i).png"
             fi
           done
 
