@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>PvP テクスチャエディタ</title>
+
+<style>
+  body {
+    background: #222;
+    color: #eee;
+    font-family: sans-serif;
+    padding: 20px;
+  }
+
+  #canvasBox {
+    width: 512px;
+    height: 512px;
+    border: 1px solid #666;
+    margin-bottom: 10px;
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0);
+    image-rendering: pixelated;
+    touch-action: none;
+  }
+
+  input, button, select {
+    margin: 6px 0;
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<h2>PvP テクスチャエディタ（完全版）</h2>
+
+<!-- キャンバス設定 -->
+<label>内部キャンバス解像度（px）:
+  <input type="number" id="canvasSize" value="16" min="1" max="256">
+</label>
+<button id="applyCanvasSize">サイズ適用</button>
+
+<div id="canvasBox">
+  <canvas id="canvas" width="16" height="16"></canvas>
+</div>
+
+<!-- ブラシ -->
+<label>ブラシカラー: <input type="color" id="color" value="#ff0000"></label>
+<label><input type="checkbox" id="eraser"> 透明ブラシ</label>
+<button id="eyedropper">スポイト</button>
+
+<!-- フィルター -->
+<h3>フィルター</h3>
+<label>彩度 <input type="range" id="saturation" min="-100" max="100" value="0"></label>
+<label>明度 <input type="range" id="brightness" min="-100" max="100" value="0"></label>
+<label>色相 <input type="range" id="hue" min="0" max="360" value="0"></label>
+
+<!-- フィルタテンプレ -->
+<h4>フィルタテンプレート</h4>
+<select id="filterTemplateSelect"></select>
+<button id="saveFilterTemplate">現在のフィルタをテンプレ保存</button>
+
+<!-- 画像テンプレ -->
+<h3>画像テンプレート</h3>
+<button id="addTemplate">テンプレ画像を追加</button>
+<input type="file" id="templateFile" accept="image/*" style="display:none;">
+<select id="templateSelect"></select>
+<button id="loadTemplateButton">テンプレ読み込み</button>
+
+<!-- リセット -->
+<button id="reset">リセット（元画像に戻す）</button>
+
+<!-- ローカル保存 -->
+<button id="saveLocal">ローカル保存</button>
+<button id="loadLocal">ローカル読み込み</button>
+
+<!-- GitHub Upload -->
+<h3>GitHub アップロード</h3>
+<label>GitHub Token: <input type="password" id="token"></label>
+<label>ユーザー名: <input type="text" id="user"></label>
+<label>リポジトリ名: <input type="text" id="repo"></label>
+<label>ディレクトリ名: <input type="text" id="dir"></label>
+<label>ファイル名: <input type="text" id="filename" value="texture.png"></label>
+<button id="upload">アップロード</button>
+
+<script>
+let canvas = document.getElementById("canvas");
+let ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+let size = 16;
+let drawing = false;
+let originalImageData = ctx.getImageData(0,0,size,size);
+
+const colorInput = document.getElementById("color");
+const eraserInput = document.getElementById("eraser");
+
+/* --- キャンバスサイズ変更（内部解像度） --- */
+document.getElementById("applyCanvasSize").onclick = () => {
+  size = parseInt(document.getElementById("canvasSize").value);
+
+  const tmp = ctx.getImageData(0,0,size,size);
+
+  canvas.width = size;
+  canvas.height = size;
+
+  ctx.putImageData(tmp,0,0);
+  originalImageData = ctx.getImageData(0,0,size,size);
+};
+
+/* --- 描画（タッチ + マウス） --- */
+canvas.addEventListener("pointerdown", e => { drawing = true; draw(e); });
+canvas.addEventListener("pointerup", () => { drawing = false; saveOriginal(); });
+canvas.addEventListener("pointermove", e => { if(drawing) draw(e); });
+
+function draw(e) {
+  const rect = canvas.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) * (size / rect.width));
+  const y = Math.floor((e.clientY - rect.top) * (size / rect.height));
+
+  ctx.globalCompositeOperation = eraserInput.checked ? "destination-out" : "source-over";
+  ctx.fillStyle = eraserInput.checked ? "rgba(0,0,0,0)" : colorInput.value;
+
+  ctx.fillRect(x, y, 1, 1);
+}
+
+/* --- スポイト --- */
+document.getElementById("eyedropper").onclick = () => {
+  canvas.addEventListener("pointerdown", pickColorOnce, { once: true });
+};
+
+function pickColorOnce(e) {
+  const rect = canvas.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) * (size / rect.width));
+  const y = Math.floor((e.clientY - rect.top) * (size / rect.height));
+
+  const data = ctx.getImageData(x, y, 1, 1).data;
+  if (data[3] === 0) return;
+
+  const hex = "#" + [data[0], data[1], data[2]]
+    .map(v => v.toString(16).padStart(2,"0"))
+    .join("");
+
+  colorInput.value = hex;
+}
+
+/* --- 元画像保存 --- */
+function saveOriginal() {
+  originalImageData = ctx.getImageData(0,0,size,size);
+}
+
+/* --- フィルター --- */
+["saturation","brightness","hue"].forEach(id => {
+  document.getElementById(id).addEventListener("input", applyFilter);
+});
+
+function applyFilter() {
+  const sat = parseInt(saturation.value);
+  const bri = parseInt(brightness.value);
+  const hu  = parseInt(hue.value);
+
+  const img = ctx.createImageData(originalImageData);
+  img.data.set(originalImageData.data);
+
+  const d = img.data;
+
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i+3] === 0) continue;
+
+    let r=d[i], g=d[i+1], b=d[i+2];
+
+    const max=Math.max(r,g,b), min=Math.min(r,g,b);
+    let h=0,s=0,l=(max+min)/2/255;
+
+    if(max!==min){
+      const diff=max-min;
+      s=l>0.5? diff/(2*255-max-min) : diff/(max+min);
+      switch(max){
+        case r: h=(g-b)/diff + (g<b?6:0); break;
+        case g: h=(b-r)/diff + 2; break;
+        case b: h=(r-g)/diff + 4; break;
+      }
+      h*=60;
+    }
+
+    h=(h+hu)%360;
+    s=Math.min(Math.max(s+sat/100,0),1);
+    l=Math.min(Math.max(l+bri/100,0),1);
+
+    const C=(1-Math.abs(2*l-1))*s;
+    const X=C*(1-Math.abs((h/60)%2-1));
+    const m=l-C/2;
+
+    let r1,g1,b1;
+    if(h<60) [r1,g1,b1]=[C,X,0];
+    else if(h<120) [r1,g1,b1]=[X,C,0];
+    else if(h<180) [r1,g1,b1]=[0,C,X];
+    else if(h<240) [r1,g1,b1]=[0,X,C];
+    else if(h<300) [r1,g1,b1]=[X,0,C];
+    else [r1,g1,b1]=[C,0,X];
+
+    d[i] = Math.round((r1+m)*255);
+    d[i+1] = Math.round((g1+m)*255);
+    d[i+2] = Math.round((b1+m)*255);
+  }
+
+  ctx.putImageData(img,0,0);
+}
+
+/* --- フィルタテンプレ --- */
+let filterTemplates = JSON.parse(localStorage.getItem("filterTemplates") || "[]");
+refreshFilterTemplateList();
+
+document.getElementById("saveFilterTemplate").onclick = () => {
+  filterTemplates.push({
+    sat:saturation.value,
+    bri:brightness.value,
+    hue:hue.value
+  });
+  localStorage.setItem("filterTemplates", JSON.stringify(filterTemplates));
+  refreshFilterTemplateList();
+};
+
+function refreshFilterTemplateList(){
+  const sel=document.getElementById("filterTemplateSelect");
+  sel.innerHTML="";
+  filterTemplates.forEach((t,i)=>{
+    const o=document.createElement("option");
+    o.value=i;
+    o.textContent=`テンプレ ${i+1}`;
+    sel.appendChild(o);
+  });
+}
+
+filterTemplateSelect.onchange = () => {
+  const t=filterTemplates[filterTemplateSelect.value];
+  if(!t) return;
+  saturation.value=t.sat;
+  brightness.value=t.bri;
+  hue.value=t.hue;
+  applyFilter();
+};
+
+/* --- 画像テンプレ --- */
+const templateFile = document.getElementById("templateFile");
+let templates = JSON.parse(localStorage.getItem("imgTemplates") || "[]");
+
+updateTemplateList();
+
+document.getElementById("addTemplate").onclick = ()=> templateFile.click();
+
+templateFile.onchange = e => {
+  const file=e.target.files[0];
+  const reader=new FileReader();
+  reader.onload=()=>{
+    templates.push(reader.result);
+    localStorage.setItem("imgTemplates", JSON.stringify(templates));
+    updateTemplateList();
+  };
+  reader.readAsDataURL(file);
+};
+
+function updateTemplateList(){
+  const sel=document.getElementById("templateSelect");
+  sel.innerHTML="";
+  templates.forEach((t,i)=>{
+    const o=document.createElement("option");
+    o.value=i;
+    o.textContent=`テンプレ画像 ${i+1}`;
+    sel.appendChild(o);
+  });
+}
+
+document.getElementById("loadTemplateButton").onclick = ()=>{
+  const data=templates[templateSelect.value];
+  if(!data) return;
+  const img=new Image();
+  img.onload=()=>{
+    ctx.clearRect(0,0,size,size);
+    ctx.drawImage(img,0,0,size,size);
+    saveOriginal();
+  };
+  img.src=data;
+};
+
+/* --- リセット --- */
+document.getElementById("reset").onclick = ()=>{
+  ctx.putImageData(originalImageData,0,0);
+  saturation.value=0;
+  brightness.value=0;
+  hue.value=0;
+};
+
+/* --- ローカル保存／読み込み --- */
+document.getElementById("saveLocal").onclick = ()=>{
+  localStorage.setItem("pvpTexture", canvas.toDataURL());
+};
+
+document.getElementById("loadLocal").onclick = ()=>{
+  const data=localStorage.getItem("pvpTexture");
+  if(!data) return;
+  const img=new Image();
+  img.onload=()=>{
+    ctx.clearRect(0,0,size,size);
+    ctx.drawImage(img,0,0,size,size);
+    saveOriginal();
+  };
+  img.src=data;
+};
+
+/* --- GitHub アップロード --- */
+document.getElementById("upload").onclick = async ()=>{
+  const token = document.getElementById("token").value;
+  const user  = document.getElementById("user").value;
+  const repo  = document.getElementById("repo").value;
+  const dir   = document.getElementById("dir").value;
+  const filename = document.getElementById("filename").value;
+
+  const content = canvas.toDataURL("image/png").split(",")[1];
+  const path = `${dir}/${filename}`;
+
+  await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${path}`,{
+    method:"PUT",
+    headers:{ "Authorization":`token ${token}` },
+    body:JSON.stringify({
+      message:"Upload PvP texture",
+      content
+    })
+  });
+
+  alert("アップロード完了");
+};
+</script>
+</body>
+</html>
