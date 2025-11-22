@@ -13,7 +13,7 @@ OUTPUT_DIR = Path("Pack/texts/ja_JP/font")
 IMG_SIZE = 64      # 1文字のサイズ
 GRID_SIZE = 16     # 1ページの横・縦文字数
 
-# 描画対象の文字列（ASCII + 拡張文字 D8）
+# ASCII + 拡張文字 D8
 D8 = ("ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ§© "
       "!\"#$%&'()*+,-./0123456789:;<=>?@"
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`"
@@ -55,7 +55,8 @@ def generate_glyph_page(chars, page_index):
         x = (idx % GRID_SIZE) * IMG_SIZE
         y = (idx // GRID_SIZE) * IMG_SIZE
         draw.text((x, y), char, font=font, fill=(255, 255, 255, 255))
-    filename = OUTPUT_DIR / f"glyph_{page_index:02d}.png"
+    # ページ番号を16進数2桁で表示
+    filename = OUTPUT_DIR / f"glyph_{page_index:02X}.png"
     page_img.save(filename)
     print(f"Generated {filename}")
 
@@ -63,8 +64,8 @@ def generate_glyph_page(chars, page_index):
 # 文字リスト作成
 # -------------------------------
 LIST = [-1] + list(range(256))  # -1 は D8 の先頭文字用
-LIST = [i for i in LIST if i < 0xd8 or i > 0xf5]  # 不要範囲除外
-LIST += list(D8)  # D8 の文字を追加して複数ページ化
+LIST = [i for i in LIST if i < 0xd8 or i > 0xf5]  # 除外範囲
+LIST += list(D8)  # D8 文字を追加
 
 # -------------------------------
 # 文字をページに分割して描画
@@ -73,11 +74,11 @@ page_chars = []
 page_index = 0
 for val in LIST:
     if val == -1:
-        char = D8[0]  # -1 は D8 の先頭文字
+        char = D8[0]
     elif isinstance(val, int):
         char = chr(val)
     else:
-        char = val  # D8 の文字
+        char = val
     page_chars.append(char)
     if len(page_chars) == GRID_SIZE*GRID_SIZE:
         generate_glyph_page(page_chars, page_index)
