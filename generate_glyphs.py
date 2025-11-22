@@ -10,7 +10,8 @@ from PIL import Image, ImageDraw, ImageFont
 FONT_URL = "https://github.com/satsuyako/YomogiFont/raw/refs/heads/ver3.00/fonts/ttf/Yomogi-Regular.ttf"
 FONT_FILE = "Yomogi-Regular.ttf"
 OUTPUT_DIR = Path("Pack/texts/ja_JP/font")
-IMG_SIZE = 64  # 1文字の画像サイズ
+IMG_SIZE = 64      # 1文字のサイズ
+GRID_SIZE = 16     # 1ページの横・縦文字数
 
 # ASCII + D8文字列
 D8 = ("ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ§© "
@@ -31,7 +32,7 @@ LIST = [i for i in LIST if i < 0xd8 or i > 0xf5]
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # -------------------------------
-# フォントファイルをダウンロード
+# フォント取得
 # -------------------------------
 if not os.path.exists(FONT_FILE):
     print(f"Downloading font from {FONT_URL}...")
@@ -49,25 +50,37 @@ else:
 font = ImageFont.truetype(FONT_FILE, IMG_SIZE)
 
 # -------------------------------
-# PNG生成関数
+# ページ単位 PNG 生成
 # -------------------------------
-def generate_glyph(char, filename):
-    img = Image.new("RGBA", (IMG_SIZE, IMG_SIZE), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    draw.text((0, 0), char, font=font, fill=(255, 255, 255, 255))
-    img.save(filename)
-
-# -------------------------------
-# 文字描画ループ
-# -------------------------------
-for i in LIST:
-    if i < 0:
-        char = D8[0]  # -1はD8の最初の文字
-    else:
-        char = chr(i)
-    hex_name = f"{(i + 256 if i < 0 else i):02x}"
-    filename = OUTPUT_DIR / f"glyph_{hex_name}.png"
-    generate_glyph(char, filename)
+def generate_glyph_page(chars, page_index):
+    page_img = Image.new("RGBA", (GRID_SIZE*IMG_SIZE, GRID_SIZE*IMG_SIZE), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(page_img)
+    for idx, char in enumerate(chars):
+        x = (idx % GRID_SIZE) * IMG_SIZE
+        y = (idx // GRID_SIZE) * IMG_SIZE
+        draw.text((x, y), char, font=font, fill=(255, 255, 255, 255))
+    filename = OUTPUT_DIR / f"glyph_page_{page_index:02d}.png"
+    page_img.save(filename)
     print(f"Generated {filename}")
 
-print("All glyph PNGs generated successfully.")
+# -------------------------------
+# 文字をページに分割して描画
+# -------------------------------
+page_chars = []
+page_index = 0
+for i, val in enumerate(LIST):
+    if val < 0:
+        char = D8[0]  # -1はD8の最初の文字
+    else:
+        char = chr(val)
+    page_chars.append(char)
+    if len(page_chars) == GRID_SIZE*GRID_SIZE:
+        generate_glyph_page(page_chars, page_index)
+        page_chars = []
+        page_index += 1
+
+# 最後のページ（余り文字）
+if page_chars:
+    generate_glyph_page(page_chars, page_index)
+
+print("All glyph pages generated successfully.")
