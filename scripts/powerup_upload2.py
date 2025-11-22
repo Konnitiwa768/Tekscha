@@ -197,7 +197,7 @@ def main():
                         upload_one(page, ef)
                         time.sleep(4)
             else:
-                page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=behavior_packs%2Fking")
+                page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=resource_packs%2Fking")
                 page.wait_for_load_state("networkidle")
                 upload_one(page, path)
                 time.sleep(4)
