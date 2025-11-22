@@ -12,6 +12,7 @@ FONT_FILE = "Yomogi-Regular.ttf"
 OUTPUT_DIR = Path("Pack/texts/ja_JP/font")
 IMG_SIZE = 64      # 1文字のサイズ
 GRID_SIZE = 16     # 1ページの横・縦文字数
+TOTAL_PAGES = 256  # 生成するページ数
 
 # ASCII + 拡張文字 D8
 D8 = ("ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ§© "
@@ -55,38 +56,40 @@ def generate_glyph_page(chars, page_index):
         x = (idx % GRID_SIZE) * IMG_SIZE
         y = (idx // GRID_SIZE) * IMG_SIZE
         draw.text((x, y), char, font=font, fill=(255, 255, 255, 255))
-    # ページ番号を16進数2桁で表示
-    filename = OUTPUT_DIR / f"glyph_{page_index:02X}.png"
+    filename = OUTPUT_DIR / f"glyph_{page_index:02X}.png"  # 16進数形式
     page_img.save(filename)
     print(f"Generated {filename}")
 
 # -------------------------------
 # 文字リスト作成
 # -------------------------------
-LIST = [-1] + list(range(256))  # -1 は D8 の先頭文字用
+LIST = [-1] + list(range(256))           # -1はD8先頭文字
 LIST = [i for i in LIST if i < 0xd8 or i > 0xf5]  # 除外範囲
-LIST += list(D8)  # D8 文字を追加
+LIST += list(D8)                         # D8文字を追加
+
+CHARS_PER_PAGE = GRID_SIZE * GRID_SIZE
+REQUIRED_LEN = TOTAL_PAGES * CHARS_PER_PAGE
+
+# 足りない分は空白で埋める
+full_list = []
+for val in LIST:
+    if val == -1:
+        full_list.append(D8[0])
+    elif isinstance(val, int):
+        full_list.append(chr(val))
+    else:
+        full_list.append(val)
+
+while len(full_list) < REQUIRED_LEN:
+    full_list.append(" ")
 
 # -------------------------------
 # 文字をページに分割して描画
 # -------------------------------
-page_chars = []
-page_index = 0
-for val in LIST:
-    if val == -1:
-        char = D8[0]
-    elif isinstance(val, int):
-        char = chr(val)
-    else:
-        char = val
-    page_chars.append(char)
-    if len(page_chars) == GRID_SIZE*GRID_SIZE:
-        generate_glyph_page(page_chars, page_index)
-        page_chars = []
-        page_index += 1
-
-# 最後のページ（余り文字）
-if page_chars:
+for page_index in range(TOTAL_PAGES):
+    start = page_index * CHARS_PER_PAGE
+    end = start + CHARS_PER_PAGE
+    page_chars = full_list[start:end]
     generate_glyph_page(page_chars, page_index)
 
-print("All glyph pages generated successfully.")
+print("All 256 glyph pages (00-FF) generated successfully.")
