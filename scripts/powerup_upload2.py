@@ -23,6 +23,7 @@ FILES = [
     {"project_id": 829201, "file_id": 7212197, "name": "BP.zip"},
     {"project_id": 829201, "file_id": 7212199, "name": "RP.zip"},
     {"project_id": 1152638, "file_id": 6994787, "name": "file2.zip"},
+    {"project_id": 1285092, "file_id": 6642300, "name": "file18.zip"},
     {"project_id": 1083023, "file_id": 6365190, "name": "file3.zip"},
     {"project_id": 993926, "file_id": 7159195, "name": "file4.zip"},
     {"project_id": 1364457, "file_id": 7198015, "name": "file9.zip"},
@@ -196,7 +197,7 @@ def main():
                         upload_one(page, ef)
                         time.sleep(4)
             else:
-                page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=behavior_packs%2FModern")
+                page.goto("https://www.powerupstack.com/panel/instances/komugi5/files?path=behavior_packs%2Fking")
                 page.wait_for_load_state("networkidle")
                 upload_one(page, path)
                 time.sleep(4)
