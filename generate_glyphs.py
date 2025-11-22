@@ -8,8 +8,8 @@ from PIL import Image, ImageDraw, ImageFont
 # 設定
 # -------------------------------
 FONT_URL = "https://github.com/satsuyako/YomogiFont/raw/refs/heads/ver3.00/fonts/ttf/Yomogi-Regular.ttf"
-FONT_FILE = "KosugiMaru-Regular.ttf"
-OUTPUT_DIR = Path("Pack/texts/ja_JP/fon ")
+FONT_FILE = "Yomogi-Regular.ttf"
+OUTPUT_DIR = Path("Pack/texts/ja_JP/font")
 IMG_SIZE = 64  # 1文字の画像サイズ
 
 # ASCII + D8文字列
