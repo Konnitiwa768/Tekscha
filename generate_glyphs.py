@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 import os
+from pathlib import Path
 import requests
 from PIL import Image, ImageDraw, ImageFont
 
-# Pack ディレクトリ
-RP_DIR = "Pack"
-FONT_DIR = os.path.join(RP_DIR, "texts/ja_JP/font")
-os.makedirs(FONT_DIR, exist_ok=True)
+# -------------------------------
+# 設定
+# -------------------------------
+FONT_URL = "https://github.com/satsuyako/YomogiFont/raw/refs/heads/ver3.00/fonts/ttf/Yomogi-Regular.ttf"
+FONT_FILE = "KosugiMaru-Regular.ttf"
+OUTPUT_DIR = Path("Pack/texts/ja_JP/fon ")
+IMG_SIZE = 64  # 1文字の画像サイズ
 
-IMG_SIZE = 64
-
-# ASCII + D8 文字列
+# ASCII + D8文字列
 D8 = ("ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ§© "
       "!\"#$%&'()*+,-./0123456789:;<=>?@"
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`"
@@ -19,34 +21,53 @@ D8 = ("ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ§© "
       "╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀"
       "αβΓπΣσμτΦΘΩδ∞∅∈∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■ ")
 
-# Google Fonts Kosugi Maru を直接取得
-font_url = "https://github.com/satsuyako/YomogiFont/raw/refs/heads/ver3.00/fonts/ttf/Yomogi-Regular.ttf"
-font_path = os.path.join(FONT_DIR, "KosugiMaru-Regular.ttf")
-
-if not os.path.exists(font_path):
-    r = requests.get(font_url)
-    r.raise_for_status()
-    with open(font_path, "wb") as f:
-        f.write(r.content)
-
-font = ImageFont.truetype(font_path, IMG_SIZE)
-
-# ASCII + D8 の文字リスト
+# 描画する文字リスト
 LIST = [-1] + list(range(256))
 LIST = [i for i in LIST if i < 0xd8 or i > 0xf5]
 
-for i in LIST:
-    if i < 0:
-        CHAR = D8[0]  # -1 は D8 の最初の文字
-    else:
-        CHAR = chr(i)
-    
-    HEX = f"{(i + 256 if i < 0 else i):02x}"
-    filename = os.path.join(FONT_DIR, f"glyph_{HEX}.png")
+# -------------------------------
+# 出力フォルダ作成
+# -------------------------------
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
+# -------------------------------
+# フォントファイルをダウンロード
+# -------------------------------
+if not os.path.exists(FONT_FILE):
+    print(f"Downloading font from {FONT_URL}...")
+    r = requests.get(FONT_URL)
+    r.raise_for_status()
+    with open(FONT_FILE, "wb") as f:
+        f.write(r.content)
+    print(f"Font saved to {FONT_FILE}")
+else:
+    print(f"Font {FONT_FILE} already exists.")
+
+# -------------------------------
+# フォント読み込み
+# -------------------------------
+font = ImageFont.truetype(FONT_FILE, IMG_SIZE)
+
+# -------------------------------
+# PNG生成関数
+# -------------------------------
+def generate_glyph(char, filename):
     img = Image.new("RGBA", (IMG_SIZE, IMG_SIZE), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
-    draw.text((0, 0), CHAR, font=font, fill=(255, 255, 255, 255))
+    draw.text((0, 0), char, font=font, fill=(255, 255, 255, 255))
     img.save(filename)
 
-print("Pack/font/glyph PNGs generated successfully.")
+# -------------------------------
+# 文字描画ループ
+# -------------------------------
+for i in LIST:
+    if i < 0:
+        char = D8[0]  # -1はD8の最初の文字
+    else:
+        char = chr(i)
+    hex_name = f"{(i + 256 if i < 0 else i):02x}"
+    filename = OUTPUT_DIR / f"glyph_{hex_name}.png"
+    generate_glyph(char, filename)
+    print(f"Generated {filename}")
+
+print("All glyph PNGs generated successfully.")
