@@ -20,6 +20,7 @@ os.makedirs(TEMP_DIR, exist_ok=True)
 
 FILES = [
     {"project_id": 1174972, "file_id": 7173049, "name": "file1.zip"},
+    {"project_id": 1125776, "file_id": 6842874, "name": "file49.zip"},
     {"project_id": 829201, "file_id": 7212197, "name": "BP.zip"},
     {"project_id": 829201, "file_id": 7212199, "name": "RP.zip"},
     {"project_id": 1152638, "file_id": 6994787, "name": "file2.zip"},
