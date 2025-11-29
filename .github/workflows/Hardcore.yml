@@ -1,0 +1,29 @@
+name: Copy UI Textures
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  copy_ui_textures:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+      - uses: actions/checkout@v4
+
+      - name: Copy textures
+        run: |
+          mkdir -p Pack/textures/ui/hardcore
+          cp -r Pack/textures/ui/* Pack/textures/ui/hardcore/
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add Pack/textures/ui/hardcore
+          git commit -m "Copy UI textures into hardcore folder" || echo "No changes to commit"
+          git push
