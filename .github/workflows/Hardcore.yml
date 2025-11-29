@@ -14,16 +14,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Copy textures
+      - name: Copy textures except hardcore
         run: |
           mkdir -p Pack/textures/ui/hardcore
-          cp -r Pack/textures/ui/* Pack/textures/ui/hardcore/
+          rsync -av --exclude='hardcore' Pack/textures/ui/ Pack/textures/ui/hardcore/
 
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
+          
           git add Pack/textures/ui/hardcore
-          git commit -m "Copy UI textures into hardcore folder" || echo "No changes to commit"
+          git commit -m "Sync UI textures into hardcore folder" || echo "No changes to commit"
           git push
