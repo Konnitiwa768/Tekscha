@@ -1,0 +1,83 @@
+name: Generate IRO Pack
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate_iro:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick uuid-runtime
+
+      - name: Create IRO folder with inverted images
+        run: |
+          rm -rf IRO
+          mkdir -p IRO
+          cp -r resource_pack/* IRO/
+
+          find IRO -type f \( -iname "*.png" -o -iname "*.jpg" \) | while read f; do
+            convert "$f" -negate "$f"
+          done
+
+      - name: Generate pack_icon
+        run: |
+          ICON=$(find resource_pack -type f -iname "*.png" | head -n 1)
+          if [ -z "$ICON" ]; then
+            convert -size 256x256 xc:white IRO/pack_icon.png
+          else
+            convert "$ICON" -negate IRO/pack_icon.png
+          fi
+
+      - name: Generate manifest.json
+        run: |
+          UUID1=$(uuidgen)
+          UUID2=$(uuidgen)
+
+          echo '{'                                  > IRO/manifest.json
+          echo '  "format_version": 2,'            >> IRO/manifest.json
+          echo '  "header": {'                     >> IRO/manifest.json
+          echo '    "name": "IRO Pack",'           >> IRO/manifest.json
+          echo '    "description": "Inverted resource images",' >> IRO/manifest.json
+          echo '    "uuid": "'$UUID1'",'           >> IRO/manifest.json
+          echo '    "version": [1, 0, 0],'         >> IRO/manifest.json
+          echo '    "min_engine_version": [1, 21, 0]' >> IRO/manifest.json
+          echo '  },'                               >> IRO/manifest.json
+          echo '  "modules": ['                     >> IRO/manifest.json
+          echo '    {'                              >> IRO/manifest.json
+          echo '      "type": "resources",'        >> IRO/manifest.json
+          echo '      "uuid": "'$UUID2'",'         >> IRO/manifest.json
+          echo '      "version": [1, 0, 0]'        >> IRO/manifest.json
+          echo '    }'                              >> IRO/manifest.json
+          echo '  ]'                                >> IRO/manifest.json
+          echo '}'                                  >> IRO/manifest.json
+
+      - name: Create mcpack
+        run: |
+          rm -f IRO.zip IRO.mcpack
+          cd IRO
+          zip -r ../IRO.zip .
+          cd ..
+          mv IRO.zip IRO.mcpack
+
+      - name: Commit and Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add IRO/ IRO.mcpack
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Generate IRO pack"
+            git push
+          fi
