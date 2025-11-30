@@ -1,0 +1,17 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "IRO Pack",
+    "description": "Inverted resource images",
+    "uuid": "0f16c8c1-4b6c-4a1a-a9ec-20ed8611a0e0",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 21, 0]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "c8f4d6f0-a3a4-4083-a0c4-cb5f88623eb8",
+      "version": [1, 0, 0]
+    }
+  ]
+}
