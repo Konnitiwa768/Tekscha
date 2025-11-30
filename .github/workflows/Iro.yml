@@ -23,15 +23,19 @@ jobs:
         run: |
           rm -rf IRO
           mkdir -p IRO
-          cp -r resource_pack/* IRO/
 
-          find IRO -type f \( -iname "*.png" -o -iname "*.jpg" \) | while read f; do
+          # textures フォルダのみコピー
+          mkdir -p IRO/textures
+          cp -r resource_pack/textures/* IRO/textures/
+
+          # 画像だけ反転
+          find IRO/textures -type f \( -iname "*.png" -o -iname "*.jpg" \) | while read f; do
             convert "$f" -negate "$f"
           done
 
       - name: Generate pack_icon
         run: |
-          ICON=$(find resource_pack -type f -iname "*.png" | head -n 1)
+          ICON=$(find resource_pack/textures -type f -iname "*.png" | head -n 1)
           if [ -z "$ICON" ]; then
             convert -size 256x256 xc:white IRO/pack_icon.png
           else
