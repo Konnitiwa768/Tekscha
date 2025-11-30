@@ -12,8 +12,8 @@ os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # ダウンロード対象 URL と保存　先　
-FILE_URL = "https://edge.forgecdn.net/files/7056/402/FarmersDelightV4.2.0-1.21.111%2b.mcaddon?ft=b87a29c0570d5d9e1d28cc8566e89815&bd=wcm5ctvx0ng"#https://raw.githubusercontent.com/Konnitiwa768/PVPVe/c81d8dcff7e1696f525ebb78f117adb0eb174c64/RP/textures/models/armor/marisa_layer_1.png" #"https://github.com/GotembaYuka/Gote-Supporter/releases/download/v1.7.3/Gote-Supporter_v1.7.3.mcpack"#"https://github.com/Konnitiwa768/Tekscha/raw/refs/heads/main/releases/Bedwars_Mega.mcpack"#https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
-FILE_NAME = "light3.zip"
+FILE_URL = "https://konnitiwa768.github.io/Tekscha/IRO.mcpack"#"https://edge.forgecdn.net/files/7056/402/FarmersDelightV4.2.0-1.21.111%2b.mcaddon?ft=b87a29c0570d5d9e1d28cc8566e89815&bd=wcm5ctvx0ng"#https://raw.githubusercontent.com/Konnitiwa768/PVPVe/c81d8dcff7e1696f525ebb78f117adb0eb174c64/RP/textures/models/armor/marisa_layer_1.png" #"https://github.com/GotembaYuka/Gote-Supporter/releases/download/v1.7.3/Gote-Supporter_v1.7.3.mcpack"#"https://github.com/Konnitiwa768/Tekscha/raw/refs/heads/main/releases/Bedwars_Mega.mcpack"#https://www.mediafire.com/file/jxwewlmnam7fm0b/Ymzie_Black.mcpack/file"# 
+FILE_NAME = "light4.zip"
 FILE_PATH = os.path.join(DOWNLOAD_DIR, FILE_NAME)
 
 
@@ -76,7 +76,7 @@ def main():
 
         # === STEP 1: ログインページ ===
         page.goto(
-            "https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi5/files?path=behavior_packs"   
+            "https://www.powerupstack.com/auth/login?redirect=/panel/instances/komugi5/files?path=resource_packs"   
             )
         page.wait_for_load_state("networkidle")
         page.screenshot(path=f"{SCREENSHOT_DIR}/01_login_page.png")
