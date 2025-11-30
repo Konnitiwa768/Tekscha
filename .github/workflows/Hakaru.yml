@@ -1,0 +1,30 @@
+name: Measure PNG Sizes
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  measure_png:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+
+      - name: Measure PNG dimensions
+        run: |
+          echo "=== PNG size list ==="
+          for f in resource_pack/textures/ui/*.png; do
+            if [ -f "$f" ]; then
+              size=$(identify -format "%wx%h" "$f")
+              echo "$f : $size"
+            fi
+          done
