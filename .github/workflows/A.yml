@@ -14,21 +14,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create MCPack archive
+      - name: Create MCPack archives
         run: |
+          # Pack フォルダをそのまま mcpack 化
           zip -r Bedwars_Mega.mcpack Pack/
 
-      - name: Commit MCPack file
+          # Pack の中身を直下に置いた mcpack を作成
+          mkdir Pack5_temp
+          cp -r Pack/* Pack5_temp/
+          (cd Pack5_temp && zip -r ../Pack5.mcpack .)
+          rm -rf Pack5_temp
+
+      - name: Commit MCPack files
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          if [ -f Bedwars_Mega.mcpack ]; then
-            mkdir -p releases
-            mv Bedwars_Mega.mcpack releases/
-            git add releases/Bedwars_Mega.mcpack
-            git commit -m "Auto-build: Bedwars Mega MCPack updated"
-            git push
-          else
-            echo "No .mcpack file generated."
-          fi
+          mkdir -p releases
+          mv Bedwars_Mega.mcpack releases/
+          mv Pack5.mcpack releases/
+
+          git add releases/Bedwars_Mega.mcpack
+          git add releases/Pack5.mcpack
+
+          git commit -m "Auto-build: MCPack files updated" || echo "No changes to commit"
+          git push
