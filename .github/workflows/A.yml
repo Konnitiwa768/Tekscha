@@ -34,6 +34,6 @@ jobs:
 
           git add releases/Bedwars_Mega.mcpack
           git add releases/Pack5.mcpack
-
+          git pull
           git commit -m "Auto-build: MCPack files updated" || echo "No changes to commit"
           git push
