@@ -16,14 +16,12 @@ jobs:
 
       - name: Create MCPack archives
         run: |
-          # Pack フォルダをそのまま mcpack 化
+          # Pack フォルダをそのまま圧縮（フォルダごと）
           zip -r Bedwars_Mega.mcpack Pack/
 
-          # Pack の中身を直下に置いた mcpack を作成
-          mkdir Pack5_temp
-          cp -r Pack/* Pack5_temp/
-          (cd Pack5_temp && zip -r ../Pack5.mcpack .)
-          rm -rf Pack5_temp
+          # Pack の中身だけを直下に入れた mcpack を作成
+          # ※Pack/フォルダ自体は含めない
+          (cd Pack && zip -r ../Pack5.mcpack .)
 
       - name: Commit MCPack files
         run: |
