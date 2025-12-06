@@ -37,4 +37,4 @@ jobs:
         git commit -m "Update generated graph"
         git push
       # もし何も変更がなければ commit が失敗するので無視
-      continue-on-error: true
+
